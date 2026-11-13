@@ -1,1624 +1,970 @@
-<title>Project Hub</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App Opportunity Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
-
 <style>
-/* ── Design tokens ─────────────────────────────────────────────────────────
-   Layout: three-panel — filter rail | main grid | collapsible notes pane
-   Type: Space Grotesk (headings) + Inter (body/data)
-   Palette: slate-tinted neutrals, indigo accent
-──────────────────────────────────────────────────────────────────────────── */
-:root {
-  --bg:          #f5f7fc;
-  --surface:     #ffffff;
-  --surface-2:   #eef0f7;
-  --surface-3:   #e4e7f2;
-  --border:      #dde1ef;
-  --border-2:    #c8cedf;
-  --fg:          #111827;
-  --fg-2:        #4b5675;
-  --fg-3:        #8792aa;
-  --accent:      #4f6ef7;
-  --accent-h:    #3d5be0;
-  --accent-soft: #eef1ff;
-  --accent-text: #3d5be0;
-  --danger:      #ef4444;
-  --warn:        #f59e0b;
-  --good:        #22c55e;
-  --info:        #6366f1;
-  --purple:      #8b5cf6;
-  --shadow-sm:   0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
-  --shadow-md:   0 4px 12px rgba(0,0,0,.09), 0 2px 4px rgba(0,0,0,.06);
-  --shadow-lg:   0 10px 30px rgba(0,0,0,.12), 0 4px 10px rgba(0,0,0,.07);
-  --radius-sm:   6px;
-  --radius:      10px;
-  --radius-lg:   16px;
-  --transition:  .18s cubic-bezier(.4,0,.2,1);
-  color-scheme: light;
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0f0f13;--bg2:#17171e;--bg3:#1e1e28;--bg4:#25252f;
+--border:#2a2a38;--border2:#35354a;
+--text:#e8e8f0;--text2:#9090a8;--text3:#606078;
+--accent:#6366f1;--accent2:#818cf8;
+--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.4);
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg:          #0d1117;
-    --surface:     #161c26;
-    --surface-2:   #1d2535;
-    --surface-3:   #242e42;
-    --border:      #252f42;
-    --border-2:    #2f3d55;
-    --fg:          #e6ecf5;
-    --fg-2:        #8a94ab;
-    --fg-3:        #56637a;
-    --accent:      #6b87f9;
-    --accent-h:    #849af9;
-    --accent-soft: #1a2347;
-    --accent-text: #8fa5ff;
-    --shadow-sm:   0 1px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.2);
-    --shadow-md:   0 4px 12px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.2);
-    --shadow-lg:   0 10px 30px rgba(0,0,0,.5), 0 4px 10px rgba(0,0,0,.3);
-    color-scheme: dark;
-  }
+[data-theme=light]{
+--bg:#f0f0f8;--bg2:#ffffff;--bg3:#e8e8f4;--bg4:#dcdcec;
+--border:#d0d0e0;--border2:#b8b8cc;
+--text:#1a1a2e;--text2:#4a4a6a;--text3:#8080a0;
+--shadow:0 4px 24px rgba(0,0,0,.12);
 }
-:root[data-theme="dark"] {
-  --bg:          #0d1117;
-  --surface:     #161c26;
-  --surface-2:   #1d2535;
-  --surface-3:   #242e42;
-  --border:      #252f42;
-  --border-2:    #2f3d55;
-  --fg:          #e6ecf5;
-  --fg-2:        #8a94ab;
-  --fg-3:        #56637a;
-  --accent:      #6b87f9;
-  --accent-h:    #849af9;
-  --accent-soft: #1a2347;
-  --accent-text: #8fa5ff;
-  --shadow-sm:   0 1px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.2);
-  --shadow-md:   0 4px 12px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.2);
-  --shadow-lg:   0 10px 30px rgba(0,0,0,.5), 0 4px 10px rgba(0,0,0,.3);
-  color-scheme: dark;
-}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif}
+a{color:var(--accent2);text-decoration:none}
+input,select,textarea{font-family:inherit;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:14px;outline:none;transition:.2s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:8px;font-size:14px;font-weight:500;transition:.2s}
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--fg);
-  font-size: 14px;
-  line-height: 1.5;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding-left: max(0px, env(safe-area-inset-left, 0px));
-  padding-right: max(0px, env(safe-area-inset-right, 0px));
-  padding-block: 0;
-}
+/* HEADER */
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;background:linear-gradient(135deg,#6366f1,#a78bfa,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.search-wrap{flex:1;max-width:400px;position:relative}
+.search-wrap input{width:100%;padding-left:36px;background:var(--bg3)}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5}
+.header-stats{display:flex;gap:16px;margin-left:auto}
+.hstat{text-align:center;line-height:1.2}
+.hstat b{font-size:16px;font-weight:700;color:var(--accent2)}
+.hstat small{font-size:11px;color:var(--text3)}
+.btn-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2)}
+.btn-icon:hover{border-color:var(--accent);color:var(--text)}
 
-/* Scrollbars */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--fg-3); }
+/* LAYOUT */
+.layout{display:flex;height:calc(100vh - 60px)}
+.sidebar{width:260px;min-width:260px;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:16px}
+.main{flex:1;overflow-y:auto;padding:20px}
 
-/* ── Typography ─────────────────────────────────────────────── */
-h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; color: var(--fg); }
-h1 { font-size: 1.5rem; font-weight: 700; }
-h2 { font-size: 1.15rem; font-weight: 600; }
-h3 { font-size: 1rem; font-weight: 600; }
+/* SIDEBAR */
+.sb-section{margin-bottom:20px}
+.sb-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-btn{background:none;border:1px solid transparent;border-radius:8px;padding:7px 10px;text-align:left;color:var(--text2);font-size:13px;display:flex;align-items:center;gap:8px;width:100%}
+.filter-btn:hover{background:var(--bg3);color:var(--text)}
+.filter-btn.active{background:rgba(99,102,241,.15);border-color:var(--accent);color:var(--accent2)}
+.filter-btn .cnt{margin-left:auto;font-size:11px;background:var(--bg4);padding:1px 6px;border-radius:20px}
+.filter-btn.active .cnt{background:rgba(99,102,241,.3)}
+.cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+select.sb-select{width:100%;margin-top:4px}
 
-/* ── Buttons ─────────────────────────────────────────────────── */
-.btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 7px 14px; border-radius: var(--radius-sm);
-  font-size: 13px; font-weight: 500; font-family: inherit;
-  border: 1px solid transparent; cursor: pointer;
-  transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition), box-shadow var(--transition);
-  white-space: nowrap; line-height: 1;
-  text-decoration: none;
-}
-.btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.btn-primary:hover { background: var(--accent-h); border-color: var(--accent-h); }
-.btn-ghost { background: transparent; color: var(--fg-2); border-color: transparent; }
-.btn-ghost:hover { background: var(--surface-2); color: var(--fg); }
-.btn-outline { background: transparent; color: var(--fg-2); border-color: var(--border); }
-.btn-outline:hover { background: var(--surface-2); color: var(--fg); border-color: var(--border-2); }
-.btn-danger { background: #fef2f2; color: var(--danger); border-color: #fecaca; }
-.btn-danger:hover { background: #fee2e2; }
-:root[data-theme="dark"] .btn-danger,
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-danger { background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.3); } }
-.btn-icon { padding: 7px; border-radius: var(--radius-sm); }
-.btn-sm { padding: 5px 10px; font-size: 12px; }
+/* CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:.2s;position:relative}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--border2)}
+.card-header{height:72px;display:flex;align-items:center;padding:0 16px;gap:12px;position:relative;overflow:hidden}
+.card-header::before{content:'';position:absolute;inset:0;opacity:.15}
+.card-emoji{font-size:28px;position:relative;z-index:1}
+.card-title-wrap{position:relative;z-index:1;flex:1;min-width:0}
+.card-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-cat{font-size:11px;opacity:.8;margin-top:2px}
+.fav-btn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.3);border:none;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;z-index:2;transition:.2s}
+.fav-btn:hover{transform:scale(1.2)}
+.card-body{padding:12px 16px}
+.card-desc{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.earn-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px}
+.earn-cell{background:var(--bg3);border-radius:8px;padding:6px 8px;text-align:center}
+.earn-cell small{display:block;font-size:10px;color:var(--text3);margin-bottom:2px}
+.earn-cell b{font-size:13px;font-weight:600}
+.diff-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.diff-label{font-size:11px;font-weight:600;min-width:70px}
+.diff-bar{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.diff-fill{height:100%;border-radius:3px;transition:.4s}
+.diff-pct{font-size:11px;color:var(--text3);min-width:30px;text-align:right}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:10px;padding:2px 7px;border-radius:12px;background:var(--bg4);color:var(--text2)}
+.status-badge{position:absolute;bottom:10px;right:10px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;cursor:pointer}
 
-/* ── Inputs ──────────────────────────────────────────────────── */
-input, select, textarea {
-  font-family: inherit; font-size: 13px;
-  background: var(--surface); color: var(--fg);
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  transition: border-color var(--transition), box-shadow var(--transition);
-  outline: none; width: 100%;
-}
-input:focus, select:focus, textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(79,110,247,.14);
-}
-input::placeholder { color: var(--fg-3); }
-textarea { resize: vertical; min-height: 72px; }
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:.2s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:800px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.modal-head{padding:0 24px;height:64px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.modal-head-emoji{font-size:32px}
+.modal-head-info{flex:1}
+.modal-head-info h2{font-size:18px;font-weight:700}
+.modal-head-info p{font-size:12px;color:var(--text2);margin-top:2px}
+.modal-close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text2);font-size:18px}
+.modal-close:hover{color:var(--text)}
+.tabs{display:flex;gap:2px;padding:12px 24px 0;border-bottom:1px solid var(--border);flex-shrink:0}
+.tab{padding:8px 14px;font-size:13px;font-weight:500;border-radius:8px 8px 0 0;cursor:pointer;color:var(--text2);border:1px solid transparent;border-bottom:none;margin-bottom:-1px;background:none}
+.tab.active{background:var(--bg3);color:var(--text);border-color:var(--border);border-bottom-color:var(--bg3)}
+.modal-body{flex:1;overflow-y:auto;padding:20px 24px}
 
-/* ── Badge/Pills ─────────────────────────────────────────────── */
-.badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 2px 8px; border-radius: 999px;
-  font-size: 11px; font-weight: 500; letter-spacing: .02em;
-  white-space: nowrap;
-}
-.badge-status-active  { background: rgba(34,197,94,.12);  color: #15803d; }
-.badge-status-paused  { background: rgba(245,158,11,.12); color: #b45309; }
-.badge-status-done    { background: rgba(99,102,241,.12); color: #4f46e5; }
-.badge-status-idea    { background: rgba(139,92,246,.12); color: #7c3aed; }
-:root[data-theme="dark"] .badge-status-active  { color: #4ade80; }
-:root[data-theme="dark"] .badge-status-paused  { color: #fbbf24; }
-:root[data-theme="dark"] .badge-status-done    { color: #818cf8; }
-:root[data-theme="dark"] .badge-status-idea    { color: #c084fc; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .badge-status-active  { color: #4ade80; }
-  :root:not([data-theme="light"]) .badge-status-paused  { color: #fbbf24; }
-  :root:not([data-theme="light"]) .badge-status-done    { color: #818cf8; }
-  :root:not([data-theme="light"]) .badge-status-idea    { color: #c084fc; }
-}
+/* TAB PANELS */
+.tab-panel{display:none}
+.tab-panel.active{display:block}
 
-.badge-priority-critical { background: rgba(239,68,68,.12);  color: #dc2626; }
-.badge-priority-high     { background: rgba(249,115,22,.12); color: #c2410c; }
-.badge-priority-medium   { background: rgba(234,179,8,.12);  color: #a16207; }
-.badge-priority-low      { background: rgba(34,197,94,.12);  color: #166534; }
-:root[data-theme="dark"] .badge-priority-critical { color: #f87171; }
-:root[data-theme="dark"] .badge-priority-high     { color: #fb923c; }
-:root[data-theme="dark"] .badge-priority-medium   { color: #fde047; }
-:root[data-theme="dark"] .badge-priority-low      { color: #4ade80; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .badge-priority-critical { color: #f87171; }
-  :root:not([data-theme="light"]) .badge-priority-high     { color: #fb923c; }
-  :root:not([data-theme="light"]) .badge-priority-medium   { color: #fde047; }
-  :root:not([data-theme="light"]) .badge-priority-low      { color: #4ade80; }
-}
+/* OVERVIEW */
+.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.info-card{background:var(--bg3);border-radius:10px;padding:14px}
+.info-card label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
+.info-card .val{font-size:15px;font-weight:600}
+.earn-big{background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:16px}
+.earn-big-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:10px}
+.earn-big-cell{text-align:center;background:var(--bg4);border-radius:8px;padding:10px}
+.earn-big-cell small{display:block;font-size:11px;color:var(--text3)}
+.earn-big-cell b{font-size:20px;font-weight:700}
+.section-title{font-size:14px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
 
-.tag {
-  display: inline-flex; align-items: center;
-  padding: 2px 7px; border-radius: var(--radius-sm);
-  font-size: 11px; font-weight: 500;
-  background: var(--surface-2); color: var(--fg-2);
-  border: 1px solid var(--border);
-  white-space: nowrap;
-}
+/* COMPETITORS */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.comp-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px}
+.comp-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.comp-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.comp-name{font-weight:600;font-size:14px}
+.comp-rating{font-size:12px;color:#fbbf24}
+.comp-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.comp-stat{background:var(--bg4);border-radius:6px;padding:5px 8px}
+.comp-stat small{display:block;font-size:10px;color:var(--text3)}
+.comp-stat b{font-size:12px;font-weight:600}
+.comp-features{margin-bottom:8px}
+.comp-features li{font-size:12px;color:var(--text2);margin-left:14px;margin-bottom:2px}
+.opp-box{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);border-radius:7px;padding:8px;font-size:12px;color:var(--accent2)}
 
-/* ── Progress bar ─────────────────────────────────────────────── */
-.progress-track {
-  height: 5px; background: var(--surface-3); border-radius: 999px; overflow: hidden;
-}
-.progress-fill {
-  height: 100%; background: var(--accent); border-radius: 999px;
-  transition: width .4s ease;
-}
-.progress-fill.done { background: var(--good); }
+/* BUILD GUIDE */
+.build-steps{display:flex;flex-direction:column;gap:12px}
+.build-step{background:var(--bg3);border-radius:10px;padding:14px;display:flex;gap:12px}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;margin-top:2px}
+.step-body h4{font-size:14px;font-weight:600;margin-bottom:4px}
+.step-body p{font-size:13px;color:var(--text2);line-height:1.5}
 
-/* ── Priority stripe ─────────────────────────────────────────── */
-.priority-stripe { width: 3px; border-radius: 2px; flex-shrink: 0; }
-.stripe-critical { background: var(--danger); }
-.stripe-high     { background: #f97316; }
-.stripe-medium   { background: var(--warn); }
-.stripe-low      { background: var(--good); }
+/* NOTES */
+.notes-area{width:100%;min-height:200px;resize:vertical;font-size:14px;line-height:1.6}
 
-/* ── Top bar ─────────────────────────────────────────────────── */
-#topbar {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50;
-  box-shadow: var(--shadow-sm);
-}
-body::before {
-  content: ""; position: fixed; inset: 0 0 auto;
-  height: env(safe-area-inset-top, 0px); z-index: 100;
-  background: var(--surface);
-}
-.logo { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.logo-icon {
-  width: 30px; height: 30px; border-radius: 8px;
-  background: var(--accent); display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: 700; font-size: 14px; font-family: 'Space Grotesk', sans-serif;
-}
-.logo-text { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; color: var(--fg); }
-.search-wrap {
-  flex: 1; max-width: 420px; position: relative;
-}
-.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--fg-3); pointer-events: none; }
-#searchInput { padding-left: 34px; }
-.topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }
-
-/* ── Main layout ─────────────────────────────────────────────── */
-#layout {
-  display: flex; flex: 1; overflow: hidden; min-height: 0;
-}
-
-/* ── Filter sidebar ───────────────────────────────────────────── */
-#filterSidebar {
-  width: 220px; flex-shrink: 0;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  overflow-y: auto; overflow-x: hidden;
-  padding: 16px 0;
-  display: flex; flex-direction: column; gap: 0;
-  transition: width var(--transition), opacity var(--transition);
-}
-#filterSidebar.collapsed { width: 0; opacity: 0; pointer-events: none; }
-.filter-section { padding: 0 14px 14px; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
-.filter-section:last-child { border-bottom: none; }
-.filter-label {
-  font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--fg-3); margin-bottom: 8px; display: block;
-}
-.filter-group { display: flex; flex-direction: column; gap: 4px; }
-.filter-btn {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 8px; border-radius: var(--radius-sm);
-  font-size: 12.5px; cursor: pointer; color: var(--fg-2);
-  background: transparent; border: none; text-align: left;
-  transition: background var(--transition), color var(--transition);
-  font-family: inherit; width: 100%;
-}
-.filter-btn:hover { background: var(--surface-2); color: var(--fg); }
-.filter-btn.active { background: var(--accent-soft); color: var(--accent-text); font-weight: 500; }
-.filter-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.filter-count { margin-left: auto; font-size: 11px; color: var(--fg-3); }
-.filter-tech-list { display: flex; flex-wrap: wrap; gap: 4px; }
-.filter-tech-btn {
-  padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500;
-  background: var(--surface-2); color: var(--fg-2); border: 1px solid var(--border);
-  cursor: pointer; transition: all var(--transition);
-}
-.filter-tech-btn.active { background: var(--accent-soft); color: var(--accent-text); border-color: var(--accent); }
-
-/* ── Main content ─────────────────────────────────────────────── */
-#mainContent {
-  flex: 1; overflow-y: auto; overflow-x: hidden;
-  padding: 20px max(16px, env(safe-area-inset-right, 0px));
-  padding-left: 20px;
-  min-width: 0;
-}
-
-/* Sort / view toolbar */
-#toolbar {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 16px; flex-wrap: wrap;
-}
-.toolbar-left { display: flex; align-items: center; gap: 8px; }
-.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
-#projectCount { font-size: 12px; color: var(--fg-3); }
-.sort-select { width: auto; padding: 6px 10px; font-size: 12.5px; }
-.view-btn { padding: 6px 8px; }
-.view-btn.active { background: var(--accent-soft); color: var(--accent-text); border-color: var(--accent); }
-
-/* ── Project grid ─────────────────────────────────────────────── */
-#projectGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
-}
-#projectGrid.list-view { grid-template-columns: 1fr; }
-
-/* Project card */
-.project-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); box-shadow: var(--shadow-sm);
-  cursor: pointer; overflow: hidden;
-  transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
-  display: flex; flex-direction: column;
-}
-.project-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); border-color: var(--border-2); }
-.card-top { display: flex; gap: 10px; padding: 14px; padding-bottom: 10px; }
-.card-stripe { width: 3px; border-radius: 2px; flex-shrink: 0; }
-.card-main { flex: 1; min-width: 0; }
-.card-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14.5px; color: var(--fg); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card-desc { font-size: 12px; color: var(--fg-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.card-meta { display: flex; align-items: center; gap: 6px; padding: 8px 14px; flex-wrap: wrap; }
-.card-tags { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 14px 10px; }
-.card-footer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-top: 1px solid var(--border); background: var(--surface-2); }
-.card-date { font-size: 11px; color: var(--fg-3); margin-left: auto; }
-
-/* List view card */
-#projectGrid.list-view .project-card { flex-direction: row; align-items: stretch; }
-#projectGrid.list-view .card-top { flex: 1; min-width: 0; align-items: center; padding: 12px 14px; }
-#projectGrid.list-view .card-tags { padding: 12px 0; border: none; flex-wrap: nowrap; overflow: hidden; }
-#projectGrid.list-view .card-footer { border-top: none; border-left: 1px solid var(--border); background: transparent; padding: 12px 14px; flex-direction: column; align-items: flex-end; justify-content: center; min-width: 160px; }
-#projectGrid.list-view .card-desc { -webkit-line-clamp: 1; }
-#projectGrid.list-view .card-meta { padding: 0 0 0 13px; }
-
-/* Empty state */
-.empty-state {
-  grid-column: 1 / -1; padding: 60px 20px; text-align: center;
-  color: var(--fg-3);
-}
-.empty-state svg { margin-bottom: 12px; opacity: .4; }
-.empty-state h3 { color: var(--fg-2); margin-bottom: 6px; }
-.empty-state p { font-size: 13px; margin-bottom: 16px; }
-
-/* ── Notes sidebar ────────────────────────────────────────────── */
-#notesSidebar {
-  width: 280px; flex-shrink: 0;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  transition: width var(--transition), opacity var(--transition);
-  overflow: hidden;
-}
-#notesSidebar.collapsed { width: 0; opacity: 0; pointer-events: none; }
-.notes-header {
-  display: flex; align-items: center; gap: 8px;
-  padding: 12px 14px; border-bottom: 1px solid var(--border);
-  flex-shrink: 0; background: var(--surface-2);
-}
-.notes-header h3 { flex: 1; font-size: 13px; }
-.notes-tabs {
-  display: flex; padding: 10px 14px 0; gap: 4px;
-  flex-shrink: 0; border-bottom: 1px solid var(--border);
-}
-.note-tab {
-  padding: 5px 10px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-  font-size: 12px; font-weight: 500; cursor: pointer; color: var(--fg-3);
-  background: transparent; border: 1px solid transparent; border-bottom: none;
-  transition: all var(--transition);
-}
-.note-tab.active { background: var(--surface); color: var(--fg); border-color: var(--border); position: relative; bottom: -1px; }
-.notes-body { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
-.note-add-wrap { padding: 10px 12px; border-top: 1px solid var(--border); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; }
-.note-add-wrap textarea { font-size: 12px; min-height: 60px; }
-.note-card {
-  background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 10px; position: relative;
-}
-.note-card:hover .note-delete { opacity: 1; }
-.note-text { font-size: 12.5px; line-height: 1.5; color: var(--fg); white-space: pre-wrap; word-break: break-word; }
-.note-time { font-size: 10.5px; color: var(--fg-3); margin-top: 5px; }
-.note-project-tag { font-size: 10px; color: var(--accent-text); font-weight: 500; margin-bottom: 4px; }
-.note-delete {
-  position: absolute; top: 6px; right: 6px;
-  opacity: 0; background: transparent; border: none;
-  cursor: pointer; color: var(--fg-3); padding: 2px;
-  transition: color var(--transition), opacity var(--transition);
-}
-.note-delete:hover { color: var(--danger); }
-
-/* ── Modals ───────────────────────────────────────────────────── */
-.modal-backdrop {
-  position: fixed; inset: 0; background: rgba(0,0,0,.5);
-  z-index: 200; display: flex; align-items: center; justify-content: center;
-  padding: max(16px, env(safe-area-inset-left, 0px));
-  animation: fadeIn .15s ease;
-}
-@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-.modal {
-  background: var(--surface); border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg); width: 100%; max-width: 640px;
-  max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;
-  animation: slideUp .18s ease;
-}
-@keyframes slideUp { from { transform: translateY(16px); opacity: 0 } to { transform: none; opacity: 1 } }
-.modal-lg { max-width: 820px; }
-.modal-sm { max-width: 400px; }
-.modal-header {
-  display: flex; align-items: center; gap: 10px;
-  padding: 18px 22px; border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.modal-header h2 { flex: 1; font-size: 1.1rem; }
-.modal-body { overflow-y: auto; padding: 20px 22px; flex: 1; }
-.modal-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
-
-/* Form layout in modal */
-.form-row { margin-bottom: 14px; }
-.form-label { display: block; font-size: 12px; font-weight: 500; color: var(--fg-2); margin-bottom: 5px; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-tags-input { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); min-height: 36px; align-items: center; cursor: text; }
-.form-tags-input:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,110,247,.14); }
-.form-tags-input input { border: none; padding: 2px 4px; background: transparent; min-width: 80px; flex: 1; box-shadow: none; }
-.form-tags-input .tag { cursor: pointer; }
-.form-tags-input .tag:hover { background: var(--surface-3); color: var(--danger); }
-
-/* Detail modal sections */
-.detail-section { margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
-.detail-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-.detail-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--fg-3); margin-bottom: 10px; }
-.detail-desc { font-size: 13.5px; line-height: 1.65; color: var(--fg-2); }
-.milestone-list { display: flex; flex-direction: column; gap: 6px; }
-.milestone-item { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-.milestone-item input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
-.milestone-item.done span { text-decoration: line-through; color: var(--fg-3); }
-.milestone-add { display: flex; gap: 6px; margin-top: 8px; }
-.milestone-add input { flex: 1; }
-.resource-list { display: flex; flex-direction: column; gap: 6px; }
-.resource-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--surface-2); border-radius: var(--radius-sm); font-size: 12.5px; }
-.resource-item a { color: var(--accent-text); text-decoration: none; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.resource-item a:hover { text-decoration: underline; }
-.history-list { display: flex; flex-direction: column; gap: 6px; }
-.history-item { display: flex; gap: 10px; font-size: 12px; color: var(--fg-2); }
-.history-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-2); flex-shrink: 0; margin-top: 4px; }
-.history-time { color: var(--fg-3); white-space: nowrap; }
-.tech-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.tech-chip { padding: 3px 10px; background: var(--surface-2); color: var(--fg-2); border-radius: var(--radius-sm); font-size: 12px; border: 1px solid var(--border); font-weight: 500; }
-.link-item { display: flex; align-items: center; gap: 6px; }
-.link-item input { flex: 1; }
-
-/* ── Stats modal ─────────────────────────────────────────────── */
-.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-.stat-card {
-  background: var(--surface-2); border-radius: var(--radius); padding: 14px;
-  text-align: center; border: 1px solid var(--border);
-}
-.stat-num { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--fg); font-variant-numeric: tabular-nums; }
-.stat-label { font-size: 11px; color: var(--fg-3); margin-top: 2px; text-transform: uppercase; letter-spacing: .06em; }
-.chart-wrap { background: var(--surface-2); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); margin-bottom: 12px; }
-.chart-title { font-size: 12px; font-weight: 600; color: var(--fg-2); margin-bottom: 12px; }
-.bar-chart { display: flex; flex-direction: column; gap: 8px; }
-.bar-row { display: flex; align-items: center; gap: 10px; }
-.bar-label { font-size: 12px; color: var(--fg-2); width: 70px; flex-shrink: 0; }
-.bar-track { flex: 1; height: 20px; background: var(--surface-3); border-radius: 4px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,.85); min-width: 24px; transition: width .4s ease; }
-
-/* ── Toast ───────────────────────────────────────────────────── */
-#toast {
-  position: fixed; bottom: max(20px, env(safe-area-inset-bottom, 0px)); left: 50%;
-  transform: translateX(-50%) translateY(0);
-  background: var(--fg); color: var(--bg);
-  padding: 10px 18px; border-radius: 999px;
-  font-size: 13px; font-weight: 500; z-index: 400;
-  box-shadow: var(--shadow-lg);
-  transition: opacity .3s, transform .3s;
-  pointer-events: none; opacity: 0;
-}
-#toast.show { opacity: 1; }
-
-/* ── Confirm dialog ───────────────────────────────────────────── */
-.confirm-msg { font-size: 14px; color: var(--fg-2); margin-bottom: 4px; }
-
-/* ── Responsive ──────────────────────────────────────────────── */
-@media (max-width: 700px) {
-  #filterSidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 100; width: 240px; padding-top: 60px; }
-  #filterSidebar.collapsed { width: 0; }
-  #notesSidebar { position: fixed; right: 0; top: 0; bottom: 0; z-index: 100; width: 85vw; max-width: 300px; }
-  #notesSidebar.collapsed { width: 0; }
-  .stat-grid { grid-template-columns: repeat(2, 1fr); }
-  .form-grid { grid-template-columns: 1fr; }
-  .modal { max-height: 95vh; }
-}
+/* ADD MODAL */
+.add-modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:520px;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:13px;font-weight:500;margin-bottom:5px;color:var(--text2)}
+.form-row input,.form-row select,.form-row textarea{width:100%}
+.btn{padding:9px 18px;border-radius:8px;font-weight:600}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+.btn-danger{background:#ef4444;color:#fff}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(99,102,241,.5);z-index:50}
+.fab:hover{background:var(--accent2);transform:scale(1.05)}
+.toast{position:fixed;bottom:80px;right:24px;background:var(--bg4);border:1px solid var(--border2);border-radius:10px;padding:10px 16px;font-size:13px;z-index:300;transform:translateY(20px);opacity:0;transition:.3s;pointer-events:none}
+.toast.show{transform:none;opacity:1}
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty h3{font-size:18px;margin-bottom:8px;color:var(--text2)}
+.top-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.top-bar h2{font-size:18px;font-weight:700;flex:1}
+.sort-sel{padding:6px 10px;font-size:13px}
+.badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;background:rgba(99,102,241,.2);color:var(--accent2)}
 </style>
+</head>
+<body>
 
-<!-- ───────────────────────── TOPBAR ───────────────────────────── -->
-<div id="topbar">
-  <div class="logo">
-    <div class="logo-icon">P</div>
-    <span class="logo-text">Project Hub</span>
-  </div>
+<header class="header">
+  <div class="logo">🚀 AppHub</div>
   <div class="search-wrap">
-    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input id="searchInput" type="search" placeholder="Search projects…" autocomplete="off">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Search apps…">
   </div>
-  <div class="topbar-actions">
-    <button class="btn btn-ghost btn-icon" id="filterToggleBtn" title="Toggle filters">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M6 12h12M9 18h6"/></svg>
-    </button>
-    <button class="btn btn-ghost btn-icon" id="statsBtn" title="Stats">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-    </button>
-    <button class="btn btn-outline btn-sm" id="importBtn">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Import
-    </button>
-    <button class="btn btn-outline btn-sm" id="exportBtn">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      Export
-    </button>
-    <button class="btn btn-primary btn-sm" id="addProjectBtn">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      New Project
-    </button>
-    <button class="btn btn-ghost btn-icon" id="notesToggleBtn" title="Toggle notes">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-    </button>
-    <button class="btn btn-ghost btn-icon" id="themeToggleBtn" title="Toggle theme">
-      <svg id="themeIcon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-    </button>
-  </div>
-</div>
+  <div class="header-stats" id="headerStats"></div>
+  <button class="btn-icon" onclick="toggleTheme()" title="Toggle theme">🌓</button>
+  <button class="btn-icon" onclick="showAdd()" title="Add app">+</button>
+</header>
 
-<!-- ───────────────────────── LAYOUT ───────────────────────────── -->
-<div id="layout">
-
-  <!-- FILTER SIDEBAR -->
-  <aside id="filterSidebar">
-    <div class="filter-section">
-      <span class="filter-label">Status</span>
-      <div class="filter-group">
-        <button class="filter-btn active" data-filter="status" data-val="all">
-          <span class="filter-dot" style="background:var(--fg-3)"></span> All
-          <span class="filter-count" id="countAll">0</span>
-        </button>
-        <button class="filter-btn" data-filter="status" data-val="active">
-          <span class="filter-dot" style="background:#22c55e"></span> Active
-          <span class="filter-count" id="countActive">0</span>
-        </button>
-        <button class="filter-btn" data-filter="status" data-val="paused">
-          <span class="filter-dot" style="background:#f59e0b"></span> Paused
-          <span class="filter-count" id="countPaused">0</span>
-        </button>
-        <button class="filter-btn" data-filter="status" data-val="done">
-          <span class="filter-dot" style="background:#6366f1"></span> Done
-          <span class="filter-count" id="countDone">0</span>
-        </button>
-        <button class="filter-btn" data-filter="status" data-val="idea">
-          <span class="filter-dot" style="background:#8b5cf6"></span> Idea
-          <span class="filter-count" id="countIdea">0</span>
-        </button>
-      </div>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sb-section">
+      <div class="sb-title">Category</div>
+      <div class="filter-group" id="catFilters"></div>
     </div>
-    <div class="filter-section">
-      <span class="filter-label">Priority</span>
-      <div class="filter-group">
-        <button class="filter-btn active" data-filter="priority" data-val="all">All priorities</button>
-        <button class="filter-btn" data-filter="priority" data-val="critical">🔴 Critical</button>
-        <button class="filter-btn" data-filter="priority" data-val="high">🟠 High</button>
-        <button class="filter-btn" data-filter="priority" data-val="medium">🟡 Medium</button>
-        <button class="filter-btn" data-filter="priority" data-val="low">🟢 Low</button>
-      </div>
+    <div class="sb-section">
+      <div class="sb-title">Min Daily Earnings</div>
+      <select class="sb-select" id="dailyFilter" onchange="setDaily(this.value)">
+        <option value="0">Any earnings</option>
+        <option value="5">$5+/day</option>
+        <option value="10">$10+/day</option>
+        <option value="20">$20+/day</option>
+        <option value="50">$50+/day</option>
+        <option value="100">$100+/day</option>
+        <option value="200">$200+/day</option>
+        <option value="500">$500+/day</option>
+        <option value="1000">$1,000+/day</option>
+      </select>
     </div>
-    <div class="filter-section">
-      <span class="filter-label">Tags</span>
-      <div class="filter-tech-list" id="tagFilterList"></div>
+    <div class="sb-section">
+      <div class="sb-title">Difficulty</div>
+      <div class="filter-group" id="diffFilters"></div>
     </div>
-    <div class="filter-section">
-      <span class="filter-label">Tech Stack</span>
-      <div class="filter-tech-list" id="techFilterList"></div>
+    <div class="sb-section">
+      <div class="sb-title">Status</div>
+      <div class="filter-group" id="statusFilters"></div>
     </div>
-    <div class="filter-section">
-      <span class="filter-label">Date Range</span>
+    <div class="sb-section">
+      <button class="filter-btn" id="favToggle" onclick="toggleFav()">❤️ Favorites only</button>
+    </div>
+    <div class="sb-section">
+      <div class="sb-title">Actions</div>
       <div style="display:flex;flex-direction:column;gap:6px">
-        <div>
-          <div class="filter-label" style="font-size:10px;margin-bottom:3px">From</div>
-          <input type="date" id="dateFrom" style="font-size:11px;padding:5px 7px">
-        </div>
-        <div>
-          <div class="filter-label" style="font-size:10px;margin-bottom:3px">To</div>
-          <input type="date" id="dateTo" style="font-size:11px;padding:5px 7px">
-        </div>
-        <button class="btn btn-ghost btn-sm" id="clearDateBtn" style="font-size:11px;padding:4px 8px;justify-content:center">Clear dates</button>
+        <button class="btn btn-ghost" style="width:100%;font-size:12px" onclick="exportData()">📤 Export JSON</button>
+        <label class="btn btn-ghost" style="width:100%;font-size:12px;text-align:center;cursor:pointer">📥 Import JSON<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
       </div>
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
-  <main id="mainContent">
-    <div id="toolbar">
-      <div class="toolbar-left">
-        <span id="projectCount">0 projects</span>
-      </div>
-      <div class="toolbar-right">
-        <select class="sort-select btn-outline" id="sortSelect" style="border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--fg)">
-          <option value="updated">Last updated</option>
-          <option value="created">Date created</option>
-          <option value="name">Name A–Z</option>
-          <option value="priority">Priority</option>
-          <option value="progress">Progress</option>
-        </select>
-        <button class="btn btn-outline btn-icon view-btn active" id="gridViewBtn" title="Grid view">
-          <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
-        </button>
-        <button class="btn btn-outline btn-icon view-btn" id="listViewBtn" title="List view">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        </button>
-      </div>
+  <main class="main">
+    <div class="top-bar">
+      <h2 id="mainTitle">All Apps</h2>
+      <span class="badge" id="countBadge">0 apps</span>
+      <select class="sort-sel" id="sortSel" onchange="setSort(this.value)">
+        <option value="revenue">Sort: Revenue</option>
+        <option value="daily">Sort: Daily $$</option>
+        <option value="diff_easy">Sort: Easiest first</option>
+        <option value="diff_hard">Sort: Hardest first</option>
+        <option value="name">Sort: Name</option>
+        <option value="status">Sort: Status</option>
+      </select>
     </div>
-    <div id="projectGrid"></div>
+    <div class="grid" id="grid"></div>
   </main>
-
-  <!-- NOTES SIDEBAR -->
-  <aside id="notesSidebar">
-    <div class="notes-header">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      <h3>Notes</h3>
-      <button class="btn btn-ghost btn-icon" id="notesCloseBtn">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="notes-tabs">
-      <button class="note-tab active" data-tab="global">Global</button>
-      <button class="note-tab" data-tab="project">Project</button>
-    </div>
-    <div class="notes-body" id="notesBody"></div>
-    <div class="note-add-wrap">
-      <textarea id="noteInput" placeholder="Add a note…" rows="3"></textarea>
-      <button class="btn btn-primary btn-sm" id="addNoteBtn" style="align-self:flex-end">
-        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Note
-      </button>
-    </div>
-  </aside>
-
 </div>
 
-<!-- ─────────────────────── ADD / EDIT PROJECT MODAL ─────────── -->
-<div id="projectModal" class="modal-backdrop" hidden>
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <h2 id="projectModalTitle">New Project</h2>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('projectModal')">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="editingId">
-      <div class="form-grid">
-        <div class="form-row" style="grid-column:1/-1">
-          <label class="form-label">Project Name *</label>
-          <input id="pName" type="text" placeholder="e.g. Personal Portfolio v2">
-        </div>
-        <div class="form-row" style="grid-column:1/-1">
-          <label class="form-label">Description</label>
-          <textarea id="pDesc" placeholder="What is this project about?"></textarea>
-        </div>
-        <div class="form-row">
-          <label class="form-label">Status</label>
-          <select id="pStatus">
-            <option value="idea">Idea</option>
-            <option value="active" selected>Active</option>
-            <option value="paused">Paused</option>
-            <option value="done">Done</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <label class="form-label">Priority</label>
-          <select id="pPriority">
-            <option value="low">Low</option>
-            <option value="medium" selected>Medium</option>
-            <option value="high">High</option>
-            <option value="critical">Critical</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <label class="form-label">Start Date</label>
-          <input id="pStartDate" type="date">
-        </div>
-        <div class="form-row">
-          <label class="form-label">Target Date</label>
-          <input id="pTargetDate" type="date">
-        </div>
-        <div class="form-row" style="grid-column:1/-1">
-          <label class="form-label">Goals</label>
-          <textarea id="pGoals" placeholder="What do you want to achieve?" style="min-height:60px"></textarea>
-        </div>
-        <div class="form-row" style="grid-column:1/-1">
-          <label class="form-label">Tech Stack (comma-separated)</label>
-          <input id="pTech" type="text" placeholder="e.g. React, Node.js, PostgreSQL">
-        </div>
-        <div class="form-row" style="grid-column:1/-1">
-          <label class="form-label">Tags (comma-separated)</label>
-          <input id="pTags" type="text" placeholder="e.g. frontend, side-project, learning">
-        </div>
-        <div class="form-row">
-          <label class="form-label">Progress (%)</label>
-          <input id="pProgress" type="number" min="0" max="100" value="0">
-        </div>
-        <div class="form-row">
-          <label class="form-label">Repo / Main URL</label>
-          <input id="pUrl" type="url" placeholder="https://github.com/…">
-        </div>
-        <div class="form-row" style="grid-column:1/-1">
-          <label class="form-label">Live URL</label>
-          <input id="pLive" type="url" placeholder="https://…">
-        </div>
+<!-- Detail Modal -->
+<div class="overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-emoji" id="mEmoji"></div>
+      <div class="modal-head-info">
+        <h2 id="mName"></h2>
+        <p id="mMeta"></p>
       </div>
+      <button class="modal-close" onclick="closeDetailDirect()">✕</button>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('projectModal')">Cancel</button>
-      <button class="btn btn-primary" id="saveProjectBtn">Save Project</button>
+    <div class="tabs" id="modalTabs"></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Add Modal -->
+<div class="overlay" id="addOverlay" onclick="closeAdd(event)">
+  <div class="add-modal">
+    <h3 style="margin-bottom:16px;font-size:16px">Add New App Idea</h3>
+    <div class="form-row"><label>App Name *</label><input id="fName" placeholder="e.g. FitTrack Pro"></div>
+    <div class="form-row"><label>Category *</label>
+      <select id="fCat">
+        <option value="">Select category…</option>
+      </select>
+    </div>
+    <div class="form-row"><label>Description</label><input id="fDesc" placeholder="What does it do?"></div>
+    <div class="form-row"><label>Revenue Estimate</label><input id="fRev" placeholder="e.g. $50k–150k/mo"></div>
+    <div class="form-row"><label>Target Audience</label><input id="fAud" placeholder="e.g. Fitness enthusiasts"></div>
+    <div class="form-row"><label>Key Features (comma-separated)</label><input id="fFeats" placeholder="e.g. Workout tracker, Nutrition log"></div>
+    <div class="form-row"><label>Notes</label><textarea id="fNotes" rows="3" placeholder="Any additional thoughts…"></textarea></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="closeAddDirect()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAdd()">Add App</button>
     </div>
   </div>
 </div>
 
-<!-- ─────────────────────── PROJECT DETAIL MODAL ─────────────── -->
-<div id="detailModal" class="modal-backdrop" hidden>
-  <div class="modal modal-lg">
-    <div class="modal-header" id="detailHeader">
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <h2 id="detailTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></h2>
-          <span id="detailStatusBadge" class="badge"></span>
-          <span id="detailPriorityBadge" class="badge"></span>
-        </div>
-        <div id="detailTechChips" class="tech-chips"></div>
-      </div>
-      <div style="display:flex;gap:6px;flex-shrink:0">
-        <button class="btn btn-outline btn-sm" id="detailEditBtn">Edit</button>
-        <button class="btn btn-ghost btn-icon" onclick="closeModal('detailModal')">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-    </div>
-    <div class="modal-body" id="detailBody">
-      <!-- filled by JS -->
-    </div>
-  </div>
-</div>
-
-<!-- ─────────────────────── STATS MODAL ──────────────────────── -->
-<div id="statsModal" class="modal-backdrop" hidden>
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <h2>Project Stats</h2>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('statsModal')">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body" id="statsBody"></div>
-  </div>
-</div>
-
-<!-- ─────────────────────── CONFIRM MODAL ────────────────────── -->
-<div id="confirmModal" class="modal-backdrop" hidden>
-  <div class="modal modal-sm">
-    <div class="modal-header"><h2 id="confirmTitle">Confirm</h2></div>
-    <div class="modal-body"><p class="confirm-msg" id="confirmMsg"></p></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('confirmModal')">Cancel</button>
-      <button class="btn btn-danger" id="confirmOkBtn">Delete</button>
-    </div>
-  </div>
-</div>
-
-<!-- ─────────────────────── IMPORT INPUT ─────────────────────── -->
-<input type="file" id="importFileInput" accept=".json" hidden>
-
-<div id="toast"></div>
+<button class="fab" onclick="showAdd()">+</button>
+<div class="toast" id="toast"></div>
 
 <script>
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// DATA
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const STORAGE_KEY  = 'projecthub_v2';
-const NOTES_KEY    = 'projecthub_notes';
-const PREFS_KEY    = 'projecthub_prefs';
-const SEED_VERSION = 'v3_60apps'; // bump to force re-seed
+const CAT={
+  'Health':     {emoji:'💪',key:'health',   color:'#10b981',bg:'linear-gradient(135deg,#064e3b,#065f46)'},
+  'Finance':    {emoji:'💰',key:'finance',  color:'#3b82f6',bg:'linear-gradient(135deg,#1e3a8a,#1e40af)'},
+  'Games':      {emoji:'🎮',key:'games',    color:'#8b5cf6',bg:'linear-gradient(135deg,#3b0764,#4c1d95)'},
+  'Music':      {emoji:'🎵',key:'music',    color:'#ec4899',bg:'linear-gradient(135deg,#831843,#9d174d)'},
+  'Tools':      {emoji:'🔧',key:'tools',    color:'#06b6d4',bg:'linear-gradient(135deg,#0c4a6e,#0e7490)'},
+  'Education':  {emoji:'📚',key:'education',color:'#f59e0b',bg:'linear-gradient(135deg,#78350f,#92400e)'},
+  'Photo & Video':{emoji:'📸',key:'photo',  color:'#f97316',bg:'linear-gradient(135deg,#7c2d12,#9a3412)'},
+  'Travel':     {emoji:'✈️',key:'travel',   color:'#14b8a6',bg:'linear-gradient(135deg,#134e4a,#115e59)'},
+  'Food':       {emoji:'🍽️',key:'food',     color:'#ef4444',bg:'linear-gradient(135deg,#7f1d1d,#991b1b)'},
+  'Pets':       {emoji:'🐾',key:'pets',     color:'#eab308',bg:'linear-gradient(135deg,#713f12,#854d0e)'},
+  'Weather':    {emoji:'⛅',key:'weather',  color:'#6366f1',bg:'linear-gradient(135deg,#312e81,#3730a3)'},
+  'Parenting':  {emoji:'👶',key:'parenting',color:'#f43f5e',bg:'linear-gradient(135deg,#881337,#9f1239)'},
+  'Sports':     {emoji:'⚽',key:'sports',   color:'#22c55e',bg:'linear-gradient(135deg,#14532d,#166534)'},
+  'Entertainment':{emoji:'🎬',key:'entertainment',color:'#a855f7',bg:'linear-gradient(135deg,#581c87,#6b21a8)'},
+};
 
-function loadProjects() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
-}
-function saveProjects(p) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch {}
-}
-function loadNotes() {
-  try { return JSON.parse(localStorage.getItem(NOTES_KEY) || '[]'); } catch { return []; }
-}
-function saveNotes(n) {
-  try { localStorage.setItem(NOTES_KEY, JSON.stringify(n)); } catch {}
-}
-function loadPrefs() {
-  try { return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { return {}; }
-}
-function savePrefs(p) {
-  try { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch {}
+const COMPS={
+  'Health':[
+    {name:'MyFitnessPal',icon:'🏋️',color:'#10b981',rating:'4.7',downloads:'50M+',rev:'$8M/mo',features:['Calorie tracking','Barcode scanner','Meal plans'],opp:'Better social features, offline mode'},
+    {name:'Noom',icon:'🥗',color:'#22c55e',rating:'4.5',downloads:'10M+',rev:'$12M/mo',features:['Psychology-based','Coaching','Group support'],opp:'Lower price point, no fluff'},
+    {name:'Fitbit',icon:'⌚',color:'#3b82f6',rating:'4.3',downloads:'30M+',rev:'$6M/mo',features:['Activity tracking','Sleep','Heart rate'],opp:'Works without expensive hardware'},
+    {name:'Headspace',icon:'🧘',color:'#8b5cf6',rating:'4.8',downloads:'15M+',rev:'$10M/mo',features:['Meditation','Sleep','Focus music'],opp:'More conditions, cheaper plans'},
+    {name:'Calm',icon:'🌊',color:'#06b6d4',rating:'4.8',downloads:'20M+',rev:'$15M/mo',features:['Sleep stories','Breathing','Anxiety relief'],opp:'Personalized AI recommendations'},
+  ],
+  'Finance':[
+    {name:'Mint',icon:'💳',color:'#22c55e',rating:'4.2',downloads:'20M+',rev:'$3M/mo',features:['Budget tracking','Bill alerts','Credit score'],opp:'Better UX, less ads, real insights'},
+    {name:'Robinhood',icon:'📈',color:'#22c55e',rating:'4.1',downloads:'15M+',rev:'$20M/mo',features:['Stock trading','Crypto','Options'],opp:'Better education for beginners'},
+    {name:'Acorns',icon:'🌰',color:'#8b5cf6',rating:'4.5',downloads:'8M+',rev:'$5M/mo',features:['Round-ups','Auto invest','Retire early'],opp:'More investment choices'},
+    {name:'Personal Capital',icon:'💼',color:'#3b82f6',rating:'4.4',downloads:'5M+',rev:'$8M/mo',features:['Net worth','Retirement','Fee analyzer'],opp:'Mobile-first, simpler setup'},
+    {name:'YNAB',icon:'📊',color:'#f59e0b',rating:'4.8',downloads:'2M+',rev:'$6M/mo',features:['Zero-based budget','Goal tracking','Reports'],opp:'Free tier, easier learning curve'},
+  ],
+  'Games':[
+    {name:'Candy Crush',icon:'🍬',color:'#f43f5e',rating:'4.5',downloads:'500M+',rev:'$30M/mo',features:['Match-3','Social','Events'],opp:'Rewarding mechanics, less pay-to-win'},
+    {name:'Clash of Clans',icon:'⚔️',color:'#f97316',rating:'4.6',downloads:'200M+',rev:'$50M/mo',features:['Base building','Clan wars','Raids'],opp:'Faster progression, modern graphics'},
+    {name:'PUBG Mobile',icon:'🎯',color:'#eab308',rating:'4.3',downloads:'300M+',rev:'$40M/mo',features:['Battle royale','Squads','Ranked'],opp:'Lower device requirements'},
+    {name:'Roblox',icon:'🧱',color:'#ef4444',rating:'4.4',downloads:'400M+',rev:'$60M/mo',features:['UGC games','Social','Avatar shop'],opp:'Better creator monetization'},
+    {name:'Pokémon GO',icon:'🎮',color:'#f59e0b',rating:'4.1',downloads:'500M+',rev:'$35M/mo',features:['AR','Location-based','Social events'],opp:'Less grind, more discovery'},
+  ],
+  'Music':[
+    {name:'Spotify',icon:'🎵',color:'#22c55e',rating:'4.7',downloads:'500M+',rev:'$100M/mo',features:['Streaming','Playlists','Podcasts'],opp:'Better artist payouts, local upload'},
+    {name:'GarageBand',icon:'🎸',color:'#f97316',rating:'4.6',downloads:'50M+',rev:'free',features:['Recording','Loops','MIDI'],opp:'Cross-platform, cloud collaboration'},
+    {name:'Smule',icon:'🎤',color:'#8b5cf6',rating:'4.3',downloads:'100M+',rev:'$5M/mo',features:['Karaoke','Duets','Social'],opp:'Better audio quality, duet discovery'},
+    {name:'BandLab',icon:'🎼',color:'#06b6d4',rating:'4.5',downloads:'20M+',rev:'$2M/mo',features:['DAW','Collaboration','Distribution'],opp:'Simpler UI for beginners'},
+    {name:'Yousician',icon:'🎹',color:'#f59e0b',rating:'4.6',downloads:'10M+',rev:'$3M/mo',features:['Guitar lessons','Piano','Real-time'],opp:'More instruments, cheaper plans'},
+  ],
+  'Tools':[
+    {name:'Notion',icon:'📝',color:'#text',rating:'4.7',downloads:'30M+',rev:'$30M/mo',features:['Notes','Databases','Team wiki'],opp:'Faster loading, simpler mobile'},
+    {name:'Todoist',icon:'✅',color:'#ef4444',rating:'4.6',downloads:'20M+',rev:'$5M/mo',features:['Tasks','Projects','Natural lang'],opp:'Better calendar integration'},
+    {name:'1Password',icon:'🔐',color:'#3b82f6',rating:'4.8',downloads:'10M+',rev:'$8M/mo',features:['Password vault','2FA','Sharing'],opp:'One-time payment option'},
+    {name:'Grammarly',icon:'✍️',color:'#22c55e',rating:'4.6',downloads:'50M+',rev:'$40M/mo',features:['Grammar check','Tone','Plagiarism'],opp:'Niche writing styles, cheaper'},
+    {name:'LastPass',icon:'🔑',color:'#ef4444',rating:'4.0',downloads:'25M+',rev:'$10M/mo',features:['Password manager','Autofill','Sharing'],opp:'Better security track record'},
+  ],
+  'Education':[
+    {name:'Duolingo',icon:'🦉',color:'#22c55e',rating:'4.7',downloads:'300M+',rev:'$25M/mo',features:['Gamified learning','Streaks','25 languages'],opp:'Professional certifications, real tutors'},
+    {name:'Khan Academy',icon:'🎓',color:'#3b82f6',rating:'4.8',downloads:'50M+',rev:'$1M/mo',features:['Math','Science','SAT prep'],opp:'Monetize with premium features'},
+    {name:'Coursera',icon:'📖',color:'#3b82f6',rating:'4.5',downloads:'20M+',rev:'$15M/mo',features:['University courses','Certificates','Job placement'],opp:'Shorter micro-courses, offline'],opp:'Better UX, niche topics'},
+    {name:'Brilliant',icon:'💡',color:'#f59e0b',rating:'4.7',downloads:'5M+',rev:'$5M/mo',features:['Interactive STEM','Puzzles','Visual learning'],opp:'More subjects, affordable pricing'},
+    {name:'Photomath',icon:'🔢',color:'#06b6d4',rating:'4.8',downloads:'100M+',rev:'$5M/mo',features:['Math scanner','Step-by-step','Graphing'],opp:'Cover all subjects with AI tutor'},
+  ],
+  'Photo & Video':[
+    {name:'VSCO',icon:'📷',color:'#f97316',rating:'4.5',downloads:'50M+',rev:'$8M/mo',features:['Filters','Editing','Social'],opp:'Better video tools, cheaper plans'},
+    {name:'Lightroom',icon:'🌅',color:'#3b82f6',rating:'4.7',downloads:'100M+',rev:'$12M/mo',features:['RAW editing','Presets','Cloud sync'],opp:'Easier for beginners, one-time pay'},
+    {name:'CapCut',icon:'🎬',color:'#000',rating:'4.8',downloads:'200M+',rev:'$20M/mo',features:['Video editing','Templates','Effects'],opp:'Specific niche focus'},
+    {name:'Facetune',icon:'💄',color:'#ec4899',rating:'4.4',downloads:'30M+',rev:'$6M/mo',features:['Portrait editing','Smooth','Retouch'],opp:'Natural-looking results, body tools'},
+    {name:'Canva',icon:'🎨',color:'#06b6d4',rating:'4.8',downloads:'100M+',rev:'$50M/mo',features:['Design templates','Social media','Presentations'],opp:'Better animation, video-first templates'},
+  ],
+  'Travel':[
+    {name:'Airbnb',icon:'🏠',color:'#f43f5e',rating:'4.7',downloads:'100M+',rev:'$200M/mo',features:['Accommodation','Experiences','Long-term stays'],opp:'Better host tools, transparent pricing'},
+    {name:'TripAdvisor',icon:'🦉',color:'#22c55e',rating:'4.4',downloads:'50M+',rev:'$30M/mo',features:['Reviews','Booking','Flights'],opp:'Personalized recommendations, local guides'},
+    {name:'Google Maps',icon:'🗺️',color:'#4285f4',rating:'4.8',downloads:'1B+',rev:'$50M/mo',features:['Navigation','Reviews','Street view'],opp:'Offline-first, adventure travel focus'},
+    {name:'Booking.com',icon:'🏨',color:'#003580',rating:'4.5',downloads:'100M+',rev:'$150M/mo',features:['Hotels','Flights','Car rental'],opp:'Budget traveler focus, local stays'},
+    {name:'Hopper',icon:'🐰',color:'#8b5cf6',rating:'4.6',downloads:'30M+',rev:'$20M/mo',features:['Price prediction','Flight deals','Hotels'],opp:'Last-minute deals, group bookings'},
+  ],
+  'Food':[
+    {name:'DoorDash',icon:'🚗',color:'#ef4444',rating:'4.6',downloads:'50M+',rev:'$200M/mo',features:['Food delivery','DashPass','DashMart'],opp:'Lower delivery fees, restaurant tools'},
+    {name:'Uber Eats',icon:'🛵',color:'#06b6d4',rating:'4.5',downloads:'50M+',rev:'$180M/mo',features:['Delivery','Pickup','Grocery'],opp:'Better meal-kit integration'},
+    {name:'Yummly',icon:'🍴',color:'#f97316',rating:'4.5',downloads:'10M+',rev:'$3M/mo',features:['Recipe discovery','Meal planning','Grocery list'],opp:'Video recipes, pantry scan'},
+    {name:'Noom',icon:'🥦',color:'#22c55e',rating:'4.5',downloads:'10M+',rev:'$12M/mo',features:['Nutrition coaching','Tracking','Psychology'],opp:'Less expensive, specific diets'},
+    {name:'Whisk',icon:'👨‍🍳',color:'#f59e0b',rating:'4.4',downloads:'5M+',rev:'$1M/mo',features:['Recipe saving','Grocery sync','Meal plans'],opp:'Social cooking, restaurant integrations'},
+  ],
+  'Pets':[
+    {name:'BarkBox',icon:'🐕',color:'#eab308',rating:'4.7',downloads:'2M+',rev:'$8M/mo',features:['Monthly box','Toys','Treats'],opp:'Digital platform, vet telehealth add-on'},
+    {name:'Rover',icon:'🐾',color:'#f97316',rating:'4.6',downloads:'10M+',rev:'$15M/mo',features:['Pet sitting','Dog walking','Boarding'],opp:'Vet network, insurance bundling'},
+    {name:'PetMD',icon:'🩺',color:'#22c55e',rating:'4.4',downloads:'5M+',rev:'$2M/mo',features:['Symptom checker','Vet finder','Pet health library'],opp:'AI symptom checker, appointment booking'},
+    {name:'Whistle',icon:'📡',color:'#3b82f6',rating:'4.3',downloads:'1M+',rev:'$2M/mo',features:['GPS tracking','Activity monitoring','Health alerts'],opp:'Software-only approach, subscription'},
+    {name:'Pawp',icon:'💊',color:'#8b5cf6',rating:'4.5',downloads:'500K+',rev:'$1M/mo',features:['Telehealth','Emergency fund','24/7 vet chat'],opp:'Wellness programs, preventive care focus'},
+  ],
+  'Weather':[
+    {name:'Weather Channel',icon:'🌩️',color:'#6366f1',rating:'4.5',downloads:'100M+',rev:'$10M/mo',features:['Hourly forecast','Radar','Alerts'],opp:'Less intrusive ads, widget focus'},
+    {name:'Dark Sky',icon:'⛈️',color:'#312e81',rating:'4.8',downloads:'10M+',rev:'$3M/mo',features:['Hyperlocal forecast','Minute-by-minute','Notifications'],opp:'Privacy-first, Android support'},
+    {name:'Weather Underground',icon:'🌡️',color:'#06b6d4',rating:'4.4',downloads:'10M+',rev:'$2M/mo',features:['Personal weather stations','Historical data','Maps'],opp:'Better UX, simplified data'],opp:'Cleaner design, relevant metrics'},
+    {name:'Carrot Weather',icon:'🤖',color:'#ef4444',rating:'4.9',downloads:'500K+',rev:'$500K/mo',features:['Humorous forecasts','Customizable','Apple Watch'],opp:'Scale with cross-platform support'},
+    {name:'WeatherBug',icon:'🐛',color:'#eab308',rating:'4.3',downloads:'20M+',rev:'$3M/mo',features:['Real-time alerts','Lightning detection','Camera network'],opp:'Focus on specific weather events'},
+  ],
+  'Parenting':[
+    {name:'BabyCenter',icon:'👶',color:'#f43f5e',rating:'4.5',downloads:'30M+',rev:'$5M/mo',features:['Week-by-week guide','Community','Expert content'],opp:'Less ads, better partner features'},
+    {name:'Ovia Parenting',icon:'🌸',color:'#ec4899',rating:'4.6',downloads:'10M+',rev:'$2M/mo',features:['Milestone tracking','Health log','Growth charts'],opp:'AI developmental insights'},
+    {name:'Cozi',icon:'📅',color:'#3b82f6',rating:'4.6',downloads:'10M+',rev:'$1M/mo',features:['Family calendar','Shopping lists','Meal planning'],opp:'Better reminders, school integration'},
+    {name:'Sprout Baby',icon:'🌱',color:'#22c55e',rating:'4.7',downloads:'2M+',rev:'$1M/mo',features:['Feeding tracker','Sleep log','Growth charts'],opp:'AI sleep coaching, shareable reports'},
+    {name:'Khan Academy Kids',icon:'🎒',color:'#f59e0b',rating:'4.7',downloads:'20M+',rev:'free',features:['Learning games','Reading','Math for kids'],opp:'Premium STEM curriculum, teacher tools'},
+  ],
+  'Sports':[
+    {name:'ESPN',icon:'📺',color:'#ef4444',rating:'4.5',downloads:'50M+',rev:'$20M/mo',features:['Live scores','News','Fantasy sports'],opp:'Niche sport focus, better analytics'},
+    {name:'Strava',icon:'🏃',color:'#f97316',rating:'4.6',downloads:'30M+',rev:'$8M/mo',features:['Activity tracking','Segments','Social'],opp:'Better coaching features, nutrition'},
+    {name:'DraftKings',icon:'🏆',color:'#22c55e',rating:'4.4',downloads:'10M+',rev:'$50M/mo',features:['Daily fantasy','Sports betting','Pick\'em'],opp:'Simpler interface, education'},
+    {name:'FanDuel',icon:'🎰',color:'#3b82f6',rating:'4.3',downloads:'10M+',rev:'$40M/mo',features:['Sports betting','Fantasy','Casino'],opp:'Better stats, responsible tools'},
+    {name:'Nike Run Club',icon:'👟',color:'#000',rating:'4.7',downloads:'50M+',rev:'$10M/mo',features:['Running tracker','Coaching','Challenges'],opp:'Multi-sport, cross-brand wearables'},
+  ],
+  'Entertainment':[
+    {name:'TikTok',icon:'🎵',color:'#000',rating:'4.7',downloads:'2B+',rev:'$500M/mo',features:['Short video','FYP algorithm','Live streaming'],opp:'Creator ownership, niche communities'},
+    {name:'Netflix',icon:'📺',color:'#ef4444',rating:'4.5',downloads:'200M+',rev:'$1B+/mo',features:['Streaming','Downloads','Original content'],opp:'User-generated content, interactive'},
+    {name:'Twitch',icon:'🎮',color:'#8b5cf6',rating:'4.4',downloads:'30M+',rev:'$30M/mo',features:['Game streaming','Chat','Subscriptions'],opp:'Non-gaming categories, better mobile'],opp:'Better revenue split for creators'},
+    {name:'YouTube',icon:'▶️',color:'#ef4444',rating:'4.6',downloads:'2B+',rev:'$2B+/mo',features:['Video hosting','Shorts','Memberships'],opp:'Niche platform, better creator tools'},
+    {name:'Patreon',icon:'🎨',color:'#f96854',rating:'4.4',downloads:'2M+',rev:'$5M/mo',features:['Creator memberships','Exclusive content','Community'],opp:'Better discovery, lower fees'},
+  ],
+};
+
+const BUILD_GUIDES={
+  'Health':[
+    {title:'Research & Validate',desc:'Identify your niche (fitness, mental health, nutrition). Survey 50+ potential users. Analyze top 3 competitors. Define your unique angle.'},
+    {title:'Core Feature MVP',desc:'Build the essential tracking feature. Use HealthKit/Google Fit APIs. Keep onboarding under 3 steps. Launch with one killer feature only.'},
+    {title:'Monetization Setup',desc:'Implement freemium model: free basic tracking, premium coaching/analytics. Set up in-app subscriptions via RevenueCat. Test $4.99–14.99/mo price points.'},
+    {title:'User Retention System',desc:'Add streaks, badges, weekly recaps. Push notification for reminders. Build habit loops. Aim for D7 retention > 30%.'},
+    {title:'Growth & Marketing',desc:'Partner with fitness influencers (micro, 10K–100K followers). Submit to App Store featuring. Create TikTok/Instagram content showing results.'},
+    {title:'Scale & Expand',desc:'Add social features once you hit 10K users. Build coach marketplace. Expand to wearables. Consider B2B wellness packages for employers.'},
+  ],
+  'Finance':[
+    {title:'Compliance & Legal',desc:'Research financial regulations in target market. Consult a fintech lawyer. Register as a money services business if needed. Plaid integration for bank linking.'},
+    {title:'Core Finance Engine',desc:'Build transaction categorization with ML. Integrate Plaid/Yodlee for bank data. Create budgeting algorithms. Focus on data accuracy above all.'},
+    {title:'Trust & Security',desc:'Get SOC 2 Type II certification. Implement 256-bit encryption, biometric auth. Display security badges prominently. Trust is your #1 marketing asset.'},
+    {title:'Monetization Strategy',desc:'Premium features: advanced analytics, credit score, investment suggestions. Consider affiliate revenue from financial products. Never sell user data.'},
+    {title:'User Education',desc:'Build financial literacy content. Send personalized insights. Weekly spending reports. Make users feel smarter, not judged.'},
+    {title:'Scale & Partnerships',desc:'Partner with banks/credit unions for white-label. Build API for other apps. Consider B2B for employer financial wellness programs.'},
+  ],
+  'Games':[
+    {title:'Game Design Document',desc:'Write a 10-page GDD: core loop, monetization model, art style, target demographic. Prototype the core mechanic in 2 weeks. Kill it if it isn\'t fun immediately.'},
+    {title:'Unity/Unreal Development',desc:'Build with Unity for mobile cross-platform. Use free asset store to prototype fast. Hire freelance artist for final art. Focus 80% time on the core loop.'},
+    {title:'Soft Launch & Tune',desc:'Soft launch in Philippines, Canada, Australia. Test monetization, D1/D7/D30 retention. Tune difficulty, pacing, ad frequency. Only scale when metrics hit benchmarks.'},
+    {title:'Monetization: IAP & Ads',desc:'Implement ironSource or AppLovin mediation. Test rewarded video vs interstitials. Build Battle Pass for recurring revenue. Target ARPU > $0.10/DAU.'},
+    {title:'UA & App Store Optimization',desc:'Create 10 video ad creatives. Test on Meta/Google UAC. Optimize screenshots and icon. Build viral loop inside the game (share score, challenge friends).'},
+    {title:'Live Operations',desc:'Weekly events keep players engaged. Seasonal content. Push notifications for limited-time offers. Build a community on Discord. Update every 2 weeks.'},
+  ],
+  'Music':[
+    {title:'Platform Architecture',desc:'Choose between streaming (licensing costs) vs tools (simpler). Music tool apps have lower legal overhead. Integrate audio recording/playback APIs early.'},
+    {title:'Audio Engine',desc:'Use AudioKit (iOS) or Oboe (Android) for low-latency audio. This is your core competitive advantage. Users will leave if audio quality or latency is poor.'},
+    {title:'Content & Licensing',desc:'For streaming: negotiate direct licensing with indie labels first. For tools: build royalty-free sample library. Consider user-generated content model.'},
+    {title:'Social & Viral Features',desc:'Share clips to TikTok/Instagram. Collaboration features keep users creating. Weekly challenges drive engagement. Leaderboards for creators.'},
+    {title:'Monetization',desc:'Test free + premium subscription. One-time purchase for tools works well. In-app packs (presets, samples, effects). Avoid ads in creation flow.'},
+    {title:'Distribution & Growth',desc:'Submit original creations from your platform to Spotify. Partner with music schools. Influencer marketing through YouTube music creators.'},
+  ],
+};
+function getBuildGuide(cat){
+  const templates=BUILD_GUIDES[cat];
+  if(templates)return templates;
+  return[
+    {title:'Market Research',desc:'Survey 100+ potential users. Study top 5 competitors. Define your niche and unique value proposition. Validate demand before building.'},
+    {title:'MVP Development',desc:'Build the minimum viable product in 4–6 weeks. Use cross-platform frameworks (React Native/Flutter). Focus only on core features that deliver value.'},
+    {title:'Beta Testing',desc:'Launch to 100 beta users. Collect structured feedback. Measure key metrics (DAU, retention, session length). Iterate based on data, not opinions.'},
+    {title:'Monetization Setup',desc:'Implement in-app subscriptions with RevenueCat. Test 3 price points. Free trial increases conversion. Build premium features users actually pay for.'},
+    {title:'App Store Launch',desc:'Optimize ASO (screenshots, description, keywords). Create launch video. Get 20+ reviews before launch. Submit to featured categories relevant to your app.'},
+    {title:'Growth & Scale',desc:'Partner with relevant influencers. Build referral program. Create content marketing. Focus on D30 retention before scaling paid acquisition.'},
+  ];
 }
 
-let projects = loadProjects();
-let notes    = loadNotes();
-let prefs    = loadPrefs();
+const STATUSES=['idea','building','launched','paused'];
+const STATUS_COLORS={idea:'rgba(99,102,241,.2)',building:'rgba(234,179,8,.2)',launched:'rgba(34,197,94,.2)',paused:'rgba(239,68,68,.2)'};
+const STATUS_TEXT={idea:'💡 Idea',building:'🔨 Building',launched:'🚀 Launched',paused:'⏸ Paused'};
+const DIFFS=['Very Easy','Easy','Medium','Hard','Very Hard','Expert'];
 
-// ── App idea seed data (60 ideas from research) ─────────────────
-// [category, genre-tag, est-monthly-rev, name, description, dau-needed, drawback, fix, tech[]]
-const APP_IDEAS = [
- ["Health","health","$150k–400k","Water intake reminder","Daily water goal by weight and weather with smart reminders","1.5k–3k","Reminders stop firing after a few days; paywall right after onboarding","Use exact alarms + quiet hours; keep logging and reminders free, earn from rewarded themes",["Android","Kotlin","AdMob"]],
- ["Health","health","$300k–1M","Step counter","Pedometer with daily goal and weekly chart","1.5k–3k","Battery drain and counts differ from phone's own count","Read steps from Health Connect / HealthKit instead of polling the sensor",["Android","Kotlin","Health Connect","AdMob"]],
- ["Health","health","$1M–5M","Intermittent fasting timer","16:8, 18:6, OMAD timers with history","1.5k–3k","Basic timer locked behind a $70/yr subscription","Free timer, stages and history; ads only on the history screen",["Flutter","Dart","AdMob"]],
- ["Health","health","$50k–200k","Blood pressure log","Log readings, trends, doctor-ready report","1.5k–3k","PDF export is paywalled; no large-text mode","Free PDF export, big buttons for older users (high-eCPM US audience)",["Flutter","Dart","AdMob"]],
- ["Health","health","$500k–2M","White noise and sleep sounds","Fan, rain, brown noise with timer","1.5k–3k","Audible gap when loop restarts; ad plays at night","Gapless loops, no ads while audio plays, one ad on app open",["Android","ExoPlayer","AdMob"]],
- ["Productivity","tools","$200k–800k","Habit tracker","Streaks, reminders, home-screen widget","2k–4k","Only 3 habits free; data lost after phone change","Unlimited habits, one-tap local and cloud backup",["Flutter","Dart","AdMob"]],
- ["Productivity","tools","$50k–300k","Pomodoro focus timer","25/5 timer with stats and white noise","2k–4k","Timer pauses or dies when screen locks","Store end time and use a foreground notification so it survives lock",["Android","Kotlin","AdMob"]],
- ["Tools","tools","$300k–1.5M","QR and barcode scanner","Scan, create, history","2k–4k","Full-screen ad after every scan; links open without warning","One interstitial per session, URL preview with safety check before opening",["Android","Kotlin","ML Kit","AdMob"]],
- ["Tools","tools","$2M+","Document / PDF scanner","Camera to clean PDF, share and OCR","2k–4k","Watermark on exports and export paywalled","Free clean export; rewarded ad unlocks OCR text copy",["Android","Kotlin","ML Kit","AdMob"]],
- ["Tools","tools","$20k–100k","Unit converter","Cooking, length, currency, fully offline","3k–4k","Banner covers keypad; needs internet","Banner at top, fully offline, favorites row",["Flutter","Dart","AdMob"]],
- ["Tools","tools","$20k–80k","Bubble level and ruler","Spirit level, angle finder, on-screen ruler","3k–4k","Inaccurate out of the box","Two-step calibration on first launch, hold-to-lock reading",["Android","Kotlin","AdMob"]],
- ["Tools","tools","$30k–150k","Decibel / sound meter","Live dB with history and noise-level labels","3k–4k","Readings far off from real meters","Calibration offset and clear 'approximate' labeling, export readings",["Android","Kotlin","AdMob"]],
- ["Tools","tools","$10k–50k","Tip and bill splitter","Split with tax, uneven shares, rounding","3k–4k","Cannot split unevenly or include tax correctly","Per-person items, tax and tip toggle",["Flutter","Dart","AdMob"]],
- ["Finance","finance","$200k–1M","Expense tracker","Quick-add spending, categories, monthly view","1k–2k","Manual entry is slow; CSV export behind paywall","Home widget for 2-tap entry, free CSV export",["Flutter","Dart","AdMob"]],
- ["Finance","finance","$30k–150k","Mortgage and loan calculator","Payments, amortization, extra-payment savings","1k–2k","No amortization table; ads look like loan offers","Full schedule and extra-payment chart, block misleading lending ads",["Flutter","Dart","AdMob"]],
- ["Finance","finance","$50k–250k","Subscription tracker","Track renewals, get reminded before charges","1k–2k","Requires bank login; feels unsafe","Manual entry, no account, on-device only",["Flutter","Dart","AdMob"]],
- ["Education","edu","$100k–500k","Driving permit test prep","Question bank by US state or UK theory test","2k–3k","Outdated questions; paywall after 10 questions","Current question bank per state, free mock tests, rewarded ad for explanations",["Flutter","Dart","AdMob"]],
- ["Education","edu","$50k–300k","Vocabulary / word of the day","Daily word, widget, quiz","2k–3k","Words repeat; widget does not refresh","Spaced repetition, widget updates daily",["Flutter","Dart","AdMob"]],
- ["Education","edu","$100k–600k","Flashcards and quiz maker","Make decks, study with spaced repetition","2k–3k","Free tier gutted by market leaders","Free unlimited decks, import from CSV",["Flutter","Dart","AdMob"]],
- ["Education","kids","$50k–200k","Times tables for kids","Games and drills for multiplication","4k+","Inappropriate ads shown to children","Families-certified ads only, parent gate, no external links",["Flutter","Dart","AdMob"]],
- ["Lifestyle","life","$100k–500k","Daily Bible verse","Verse, reflection, reminder, share card","2k–4k","Ads with off-topic or offensive content","Block sensitive ad categories, rewarded ad for themes",["Flutter","Dart","AdMob"]],
- ["Lifestyle","life","$20k–100k","Event countdown widget","Days until trips, birthdays, holidays","3k–4k","Widget stops updating or shows wrong days","Midnight refresh, photo backgrounds, free widgets",["Android","Kotlin","AdMob"]],
- ["Music","music","$100k–500k","Guitar tuner","Chromatic tuner plus alternate tunings","2k–4k","Laggy pitch detection; alternate tunings paywalled","Native pitch detection module, all tunings free, rewarded chord library packs",["Android","Kotlin","AdMob"]],
- ["Music","music","$20k–100k","Metronome","BPM, time signatures, tap tempo","3k–4k","Beat drifts out of time; stops in background","Schedule clicks on native audio clock, background audio",["Android","Kotlin","AdMob"]],
- ["Music","music","$50k–300k","Ringtone maker","Cut any song into a ringtone or alarm (Android)","2k–4k","Ad after every action; crashes on long files","Ad only after saving, stream the waveform instead of full load",["Android","Kotlin","AdMob"]],
- ["Games","games","$500k–3M","Sudoku","Daily puzzles, 4 difficulties, notes","700–1.5k","Ads pop up mid-puzzle","Interstitial only between puzzles, rewarded hints",["Flutter","Dart","AdMob"]],
- ["Games","games","$300k–2M","Word search","Themed packs, large-text mode","700–1.5k","Ad every level; tiny letters for older players","Large-text mode, ad every 3 levels, rewarded 'find a word'",["Flutter","Dart","AdMob"]],
- ["Games","games","$1M–5M","Solitaire","Classic Klondike with daily challenge","700–1.5k","Unwinnable deals and forced ads","'Winnable deals only' option, ad frequency cap",["Flutter","Dart","AdMob"]],
- ["Games","games","$1M–10M","Block puzzle","Fit blocks on an 8×8 grid","700–1.5k","Rigged-feeling pieces, 30-second ads after each round","Fair random pieces, short skippable ads, rewarded 'continue'",["Flutter","Dart","AdMob"]],
- ["Games","games","$500k–3M","Color sort puzzle","Sort colored balls or water into tubes","700–1.5k","Unskippable ads every level; levels repeat","Ad every 3–4 levels, generated levels, rewarded 'extra tube'",["Flutter","Dart","AdMob"]],
- ["Health","health","$200k–800k","Simple calorie counter","Quick food log with barcode scan","1.5k–3k","Barcode scanning and macros locked behind subscription","Free barcode lookup via Open Food Facts, quick re-add recent meals",["Flutter","Dart","Open Food Facts API","AdMob"]],
- ["Health","health","$100k–400k","Home workout — no equipment","7- and 20-minute routines with voice cues","1.5k–3k","Same routines every day; voice cues cut out","Randomized circuits by muscle group, offline audio cues",["Flutter","Dart","AdMob"]],
- ["Sports","health","$50k–250k","Run/walk interval trainer","Couch-to-5K style plan with audio prompts","1.5k–3k","Prompts stop when music app plays or screen locks","Audio ducking over music, background-safe timer",["Android","Kotlin","AdMob"]],
- ["Sports","tools","$30k–150k","Score keeper","Scores for card games, board games, pickleball","3k–4k","Ads cover score buttons; scores reset on rotate","Persist every tap, ads only on summary screen",["Flutter","Dart","AdMob"]],
- ["Productivity","tools","$100k–500k","Shift work calendar","Rotating shift patterns for nurses, police, factory staff","2k–4k","Pattern setup is confusing; no calendar export","Built-in templates (4-on-4-off, Pitman, DuPont), export to phone calendar",["Flutter","Dart","AdMob"]],
- ["Productivity","tools","$50k–250k","Quick notes with widget","Sticky-note style notes on the home screen","2k–4k","Sync bugs lose notes","Local-first storage, optional backup file",["Android","Kotlin","AdMob"]],
- ["Tools","tools","$100k–400k","Flashlight with SOS and strobe","One-tap torch, SOS, screen light","3k–4k","Asks for contacts and location for no reason","Zero extra permissions; call that out in the store listing",["Android","Kotlin","AdMob"]],
- ["Tools","tools","$100k–500k","Wi-Fi analyzer","Signal strength and channel finder (Android)","2k–4k","Jargon-heavy; users don't know what to change","Plain-language 'best channel for your router' tip",["Android","Kotlin","AdMob"]],
- ["Finance","finance","$50k–200k","Take-home pay calculator","US state taxes and UK PAYE / National Insurance","1k–2k","Outdated tax tables give wrong numbers","Update tables each tax year, show the year on screen",["Flutter","Dart","AdMob"]],
- ["Finance","finance","$30k–150k","Savings goal jar","Visual goals with deposits and progress","1k–2k","No reminders, users forget to log","Payday reminders and a progress widget",["Flutter","Dart","AdMob"]],
- ["Education","edu","$100k–400k","US citizenship test prep","Civics questions with audio","2k–3k","Old question set and no audio","Current civics set with audio; fills in your state's officials",["Flutter","Dart","AdMob"]],
- ["Education","edu","$50k–250k","Learn sign language","Alphabet, words, daily practice (ASL / BSL)","2k–3k","Paywall right after the alphabet; low-quality videos","Free core vocabulary, rewarded ads unlock themed packs",["Flutter","Dart","AdMob"]],
- ["Education","kids","$50k–200k","Toddler ABC and phonics","Tap letters, hear sounds, tracing","4k+","Toddlers tap ads by accident","Parent gate on all ads, ads only on the parent screen",["Flutter","Dart","AdMob"]],
- ["Music","music","$100k–500k","Drum pads and beat maker","Pads, loops, record and share","2k–4k","Audio lag between tap and sound","Low-latency native audio module, preloaded samples",["Android","Kotlin","AdMob"]],
- ["Music","music","$50k–200k","Vocal range and pitch trainer","Find your range, sing-along pitch drills","2k–4k","Pitch detection jumps around","Smoothed pitch readout, mic noise calibration",["Android","Kotlin","AdMob"]],
- ["Games","games","$1M–5M","Mahjong tile matching","Classic tile-match solitaire","700–1.5k","Tiles too small for older players","Large-tile mode, zoom, ad every few boards",["Flutter","Dart","AdMob"]],
- ["Games","games","$300k–2M","Nonogram / picture cross","Logic grid puzzles that reveal pictures","700–1.5k","Mistakes punished with ads; few free puzzles","Unlimited generated puzzles, rewarded 'check row'",["Flutter","Dart","AdMob"]],
- ["Games","games","$1M–5M","Jigsaw puzzles","Daily photo jigsaws, 36–400 pieces","700–1.5k","Pictures locked behind coins","Daily free puzzle, rewarded ads unlock packs",["Flutter","Dart","AdMob"]],
- ["Games","games","$200k–1M","Trivia quiz","Daily trivia by topic, US / UK","700–1.5k","Questions repeat quickly","Large question bank, no repeats for 30 days",["Flutter","Dart","AdMob"]],
- ["Games","games","$300k–1.5M","Idle tycoon","Build a lemonade or coffee empire offline","700–1.5k","Progress walls force ad watching","Rewarded ads as optional boosts only, fair offline earnings",["Flutter","Dart","AdMob"]],
- ["Photo & Video","photo","$200k–1M","Background remover","Cut out people and products for listings","2k–4k","Watermark and low-resolution export","On-device cutout, full-res export after a rewarded ad",["Android","Kotlin","ML Kit","AdMob"]],
- ["Photo & Video","photo","$100k–500k","Video compressor","Shrink videos to send by email or chat","2k–4k","Watermark and quality loss","No watermark, size target presets (e.g. under 25 MB)",["Android","Kotlin","FFmpeg","AdMob"]],
- ["Travel","travel","$50k–250k","Packing list","Lists by trip type and weather","1.5k–3k","Lists can't be reused or shared","Templates, duplicate past trips, share as text",["Flutter","Dart","AdMob"]],
- ["Travel","travel","$30k–150k","Fuel cost and mileage log","Trip fuel cost, MPG, expense mileage","1.5k–3k","No export for mileage claims","Free CSV/PDF export for tax or employer claims",["Flutter","Dart","AdMob"]],
- ["Food","life","$100k–500k","Recipe saver with cooking mode","Save recipes from any website","2k–4k","Import fails; screen sleeps while cooking","Reliable recipe parsing, keep-awake cooking mode, no ads in cooking mode",["Flutter","Dart","AdMob"]],
- ["Food","life","$30k–150k","Shared grocery list","One list for the household","2k–4k","Forced account sign-up to share","Share by link or code, no account required",["Flutter","Dart","Firebase","AdMob"]],
- ["Pets","life","$50k–200k","Pet care tracker","Vaccines, meds, feeding, vet visits","2k–4k","Reminders unreliable; one pet only free","Multiple pets free, exact-time reminders",["Flutter","Dart","AdMob"]],
- ["Weather","life","$1M+","Simple rain alert weather","Next-hour rain alerts and clean forecast","2k–4k","Too many ads and location data sold","Light ads, no data selling, clear privacy label",["Flutter","Dart","Weather API","AdMob"]],
- ["Parenting","life","$100k–500k","Baby feeding and sleep log","Breast/bottle, diapers, naps tracker","2k–4k","Hard to use one-handed at 3 a.m.","Big one-tap buttons, dark night mode, partner sharing",["Flutter","Dart","AdMob"]],
- ["Entertainment","life","$100k–400k","HD wallpapers","Curated wallpapers by theme","2k–4k","Ad between every wallpaper; low resolution","Ad only on download, true device-resolution images",["Flutter","Dart","AdMob"]]
+const SK='projecthub_v2',NK='projecthub_notes',PK='projecthub_prefs',FK='projecthub_favs';
+const SEED_KEY='projecthub_seed',SEED_VER='v5_redesign';
+
+function parseMonthly(rev){
+  if(!rev)return 0;
+  const m=rev.match(/\$(\d+(?:\.\d+)?)(k|M)?(?:[–-]\$?(\d+(?:\.\d+)?)(k|M)?)?/i);
+  if(!m)return 0;
+  const mult=s=>s&&s.toLowerCase()==='m'?1000000:s&&s.toLowerCase()==='k'?1000:1;
+  const lo=parseFloat(m[1])*mult(m[2]);
+  const hi=m[3]?parseFloat(m[3])*mult(m[4]):lo;
+  return(lo+hi)/2;
+}
+function getEarnings(rev){
+  const mo=parseMonthly(rev);
+  if(!mo)return{d:'—',w:'—',m:'—',daily:0};
+  const fmt=n=>n>=1000000?'$'+(n/1000000).toFixed(1)+'M':n>=1000?'$'+(n/1000).toFixed(0)+'k':'$'+Math.round(n);
+  return{d:fmt(mo/30),w:fmt(mo/4.3),m:fmt(mo),daily:mo/30};
+}
+function getDiff(rev){
+  const mo=parseMonthly(rev);
+  if(mo>=800000)return{label:'Expert',pct:10,color:'#ef4444'};
+  if(mo>=400000)return{label:'Very Hard',pct:22,color:'#f97316'};
+  if(mo>=150000)return{label:'Hard',pct:38,color:'#eab308'};
+  if(mo>=50000) return{label:'Medium',pct:58,color:'#3b82f6'};
+  if(mo>=15000) return{label:'Easy',pct:76,color:'#22c55e'};
+  return{label:'Very Easy',pct:92,color:'#10b981'};
+}
+
+const SEED_APPS=[
+  // HEALTH (20)
+  {name:'FitAI Coach',cat:'Health',desc:'AI personal trainer that adapts workouts to your progress, fatigue level and equipment.',rev:'$150k–400k',aud:'Fitness beginners aged 20–35',feats:['AI workout generator','Recovery tracking','Form analysis via camera','Nutrition sync'],priority:'high',status:'idea'},
+  {name:'MindfulMe',cat:'Health',desc:'Mental wellness app combining CBT exercises, mood tracking and guided breathing.',rev:'$80k–200k',aud:'Young professionals with anxiety',feats:['CBT modules','Mood journal','Breathing exercises','Therapist directory'],priority:'high',status:'idea'},
+  {name:'SleepDoc',cat:'Health',desc:'Sleep optimization using phone sensors and smart alarm to track sleep cycles.',rev:'$60k–150k',aud:'Poor sleepers aged 25–45',feats:['Sleep cycle detection','Smart alarm','Sleep score','Tips & insights'],priority:'medium',status:'idea'},
+  {name:'HydroTrack',cat:'Health',desc:'Smart water intake reminder with wearable sync and intake analytics.',rev:'$20k–60k',aud:'Health-conscious people',feats:['Water reminders','Wearable sync','Daily streaks','Custom bottles'],priority:'low',status:'idea'},
+  {name:'PainLog',cat:'Health',desc:'Chronic pain diary for tracking triggers, medication and sharing reports with doctors.',rev:'$30k–80k',aud:'Chronic pain patients',feats:['Pain diary','Trigger analysis','Doctor-ready reports','Medication tracker'],priority:'medium',status:'idea'},
+  {name:'PostureGuard',cat:'Health',desc:'Uses phone camera or wearable to detect and correct poor posture in real time.',rev:'$40k–100k',aud:'Remote workers and desk jobs',feats:['Posture alerts','Camera analysis','Desk ergonomics tips','Streak rewards'],priority:'medium',status:'idea'},
+  {name:'FertilityFlow',cat:'Health',desc:'Hormone and fertility cycle tracker with AI ovulation prediction.',rev:'$80k–250k',aud:'Women trying to conceive',feats:['BBT logging','Hormone chart','OPK test photo analysis','Doctor share'],priority:'high',status:'idea'},
+  {name:'MedRemind',cat:'Health',desc:'Smart medication reminder with refill tracking, drug interactions checker.',rev:'$30k–90k',aud:'Elderly and chronic illness patients',feats:['Pill reminders','Refill alerts','Drug interaction check','Caregiver share'],priority:'medium',status:'idea'},
+  {name:'FitKids',cat:'Health',desc:'Gamified fitness app for children aged 4–12 with parent dashboard.',rev:'$50k–150k',aud:'Parents of young children',feats:['Fun exercise games','Parent dashboard','School challenges','Achievement badges'],priority:'medium',status:'idea'},
+  {name:'RecoveryPro',cat:'Health',desc:'Post-surgery and injury rehabilitation tracker with physio-designed protocols.',rev:'$40k–120k',aud:'Post-surgery patients',feats:['Rehab exercise library','Progress photos','PT messaging','Pain journal'],priority:'medium',status:'idea'},
+  {name:'AllergyAlert',cat:'Health',desc:'Real-time pollen, air quality and food allergen tracker with personalized alerts.',rev:'$25k–70k',aud:'Allergy and asthma sufferers',feats:['Pollen map','Air quality index','Food scanner','Custom alerts'],priority:'low',status:'idea'},
+  {name:'StrengthStack',cat:'Health',desc:'Powerlifting and strength training app with periodization and 1RM calculator.',rev:'$30k–80k',aud:'Intermediate to advanced lifters',feats:['Periodization programs','1RM calculator','Plate calculator','Video form checks'],priority:'low',status:'idea'},
+  {name:'GutHealth',cat:'Health',desc:'Microbiome-focused diet tracker linking food intake to digestive symptoms.',rev:'$40k–100k',aud:'IBS and digestive condition sufferers',feats:['Food-symptom diary','Low-FODMAP guide','Gut score','Recipe suggestions'],priority:'medium',status:'idea'},
+  {name:'VisionLog',cat:'Health',desc:'Eye health tracker for screen time, dry eye symptoms and vision test reminders.',rev:'$20k–50k',aud:'Heavy screen users',feats:['Screen time tracking','20-20-20 rule reminders','Vision test log','Blue light tips'],priority:'low',status:'idea'},
+  {name:'DentAI',cat:'Health',desc:'AI dental health app analyzing selfies for potential cavities and gum issues.',rev:'$50k–150k',aud:'People avoiding dentist visits',feats:['Selfie dental scan','Cavity risk score','Brushing timer','Dentist finder'],priority:'high',status:'idea'},
+  {name:'YogaFlow',cat:'Health',desc:'AI-guided yoga sessions adapting to your flexibility level with pose correction.',rev:'$60k–180k',aud:'Yoga beginners and intermediate',feats:['AI pose correction','Custom flows','Timer & breath guide','Progress streaks'],priority:'medium',status:'idea'},
+  {name:'BloodSugarCoach',cat:'Health',desc:'Lifestyle coaching app for pre-diabetics and Type 2 diabetics tracking diet and glucose.',rev:'$70k–200k',aud:'Pre-diabetic and Type 2 patients',feats:['Glucose log','Meal impact analysis','Carb counter','HbA1c tracker'],priority:'high',status:'idea'},
+  {name:'BrainTrain',cat:'Health',desc:'Cognitive exercises targeting memory, focus and reaction time, backed by neuroscience.',rev:'$50k–150k',aud:'Adults concerned about cognitive decline',feats:['Daily brain games','Cognitive score','Progress trends','Science articles'],priority:'medium',status:'idea'},
+  {name:'RunCoach AI',cat:'Health',desc:'AI running coach building personalized marathon and 5K training plans.',rev:'$40k–120k',aud:'Amateur runners training for races',feats:['AI training plan','GPS run tracker','VO2 max estimate','Race-day pacing'],priority:'medium',status:'idea'},
+  {name:'HealthDiary',cat:'Health',desc:'Holistic daily health journal combining mood, energy, sleep, diet and exercise.',rev:'$30k–90k',aud:'Health-conscious journalers',feats:['Daily health log','Correlations dashboard','Weekly report','Doctor export'],priority:'low',status:'idea'},
+  // FINANCE (20)
+  {name:'BudgetBuddy AI',cat:'Finance',desc:'Conversational AI budgeting assistant that learns your habits and negotiates bills.',rev:'$100k–300k',aud:'Young adults aged 22–35',feats:['AI chat budgeting','Bill negotiation','Spending insights','Savings goals'],priority:'high',status:'idea'},
+  {name:'CryptoSimple',cat:'Finance',desc:'Simplified crypto portfolio tracker and educational platform for beginners.',rev:'$80k–200k',aud:'Crypto beginners',feats:['Portfolio tracker','Plain-English explanations','Price alerts','Beginner courses'],priority:'high',status:'idea'},
+  {name:'TaxPal',cat:'Finance',desc:'Year-round tax optimization tracker helping freelancers and self-employed maximize deductions.',rev:'$60k–180k',aud:'Freelancers and gig workers',feats:['Expense categorizer','Mileage tracker','Quarterly tax estimator','Document vault'],priority:'high',status:'idea'},
+  {name:'RentReady',cat:'Finance',desc:'First-time renter financial prep: credit building, deposit savings, lease analyzer.',rev:'$30k–80k',aud:'First-time renters aged 18–28',feats:['Credit builder','Savings automation','Lease red-flag analyzer','Move-in checklist'],priority:'medium',status:'idea'},
+  {name:'DebtCrusher',cat:'Finance',desc:'Debt payoff optimizer using avalanche/snowball methods with motivational milestones.',rev:'$25k–70k',aud:'People with multiple debts',feats:['Debt payoff calculator','Avalanche vs snowball','Payoff milestones','Interest saved counter'],priority:'medium',status:'idea'},
+  {name:'FamilyWallet',cat:'Finance',desc:'Shared family finance app with individual accounts, allowances and spending visibility.',rev:'$40k–100k',aud:'Families with teenagers',feats:['Shared budget','Kids allowance tracking','Spending visibility','Chore-to-allowance link'],priority:'medium',status:'idea'},
+  {name:'InvestEasy',cat:'Finance',desc:'Micro-investing platform for beginners with round-ups and guided portfolios.',rev:'$80k–250k',aud:'Non-investors aged 25–40',feats:['Round-up investing','Simple portfolios','Goal-based investing','No-jargon education'],priority:'high',status:'idea'},
+  {name:'InsurancePal',cat:'Finance',desc:'Insurance management, comparison and policy analyzer helping users find gaps.',rev:'$50k–150k',aud:'Homeowners and families',feats:['Policy vault','Coverage gap analysis','Price comparison','Claim assistance'],priority:'medium',status:'idea'},
+  {name:'NetWorthNow',cat:'Finance',desc:'Beautiful real-time net worth tracker connecting all assets, debts and investments.',rev:'$30k–90k',aud:'Financially-aware adults 30–50',feats:['Asset aggregation','Net worth chart','Milestone alerts','Retirement projection'],priority:'medium',status:'idea'},
+  {name:'FreelanceFinance',cat:'Finance',desc:'Income and invoice management for freelancers with tax withholding automation.',rev:'$40k–120k',aud:'Freelancers and contractors',feats:['Invoice creator','Income tracking','Tax withholding calc','Expense tracker'],priority:'high',status:'idea'},
+  {name:'KidsMoney',cat:'Finance',desc:'Gamified financial literacy app for kids aged 8–14 with virtual allowance system.',rev:'$20k–60k',aud:'Parents teaching kids about money',feats:['Virtual allowance','Saving goals game','Spending lessons','Parent controls'],priority:'low',status:'idea'},
+  {name:'RealEstateIQ',cat:'Finance',desc:'Real estate investment analyzer calculating ROI, cash flow and market comparables.',rev:'$50k–150k',aud:'Aspiring real estate investors',feats:['ROI calculator','Cash flow analysis','Market comparables','Deal scoring'],priority:'medium',status:'idea'},
+  {name:'BillSplit Pro',cat:'Finance',desc:'Smart expense splitting for roommates, couples and groups with payment integration.',rev:'$20k–50k',aud:'Roommates and frequent travelers',feats:['Expense splitting','Group settlement','Payment integration','Receipt scanner'],priority:'low',status:'idea'},
+  {name:'ETFBuilder',cat:'Finance',desc:'Custom ETF and index fund portfolio builder with factor analysis and rebalancing.',rev:'$40k–100k',aud:'DIY investors',feats:['Portfolio builder','Factor analysis','Auto-rebalancing','Tax-loss harvesting'],priority:'medium',status:'idea'},
+  {name:'SideHustleTracker',cat:'Finance',desc:'Income and expense tracker specifically for side hustle entrepreneurs.',rev:'$25k–70k',aud:'Side hustlers and solopreneurs',feats:['Multi-income tracking','Business expense logger','Profitability dashboard','Tax summary'],priority:'medium',status:'idea'},
+  {name:'CollegeFund',cat:'Finance',desc:'529 plan optimizer and college savings calculator helping parents maximize education savings.',rev:'$20k–60k',aud:'Parents of young children',feats:['529 plan optimizer','Savings projector','College cost database','Contribution planner'],priority:'low',status:'idea'},
+  {name:'CashFlowAI',cat:'Finance',desc:'Predictive cash flow app for small business owners forecasting 90-day financial health.',rev:'$60k–180k',aud:'Small business owners',feats:['Cash flow forecast','Invoice aging','Expense pattern analysis','Low-cash alerts'],priority:'high',status:'idea'},
+  {name:'SubscriptionKiller',cat:'Finance',desc:'Automatically detects and cancels unwanted subscriptions, tracking recurring charges.',rev:'$30k–80k',aud:'Overspending consumers',feats:['Auto-detect subscriptions','One-tap cancel','Savings tracker','Annual waste calculator'],priority:'medium',status:'idea'},
+  {name:'DividendDash',cat:'Finance',desc:'Dividend income tracker and optimizer for passive income investors.',rev:'$25k–70k',aud:'Dividend investors',feats:['Dividend calendar','Yield tracker','Reinvestment calculator','Portfolio income projection'],priority:'low',status:'idea'},
+  {name:'EmergencyFund',cat:'Finance',desc:'Emergency fund calculator and auto-savings tool that slowly builds financial safety net.',rev:'$15k–50k',aud:'People with no savings buffer',feats:['Fund calculator','Auto-savings rules','Progress visualization','Spending cut suggestions'],priority:'low',status:'idea'},
+  // GAMES (20)
+  {name:'PocketRPG',cat:'Games',desc:'Deep offline RPG with procedural world generation, no ads, one-time purchase.',rev:'$100k–300k',aud:'Core mobile gamers aged 18–35',feats:['Procedural worlds','Turn-based combat','Offline play','No ads/IAP'],priority:'high',status:'idea'},
+  {name:'WordBlitz',cat:'Games',desc:'Fast-paced multiplayer word game with daily tournaments and global leaderboards.',rev:'$30k–80k',aud:'Word game fans aged 25–50',feats:['Multiplayer word battles','Daily tournaments','Vocabulary builder','Social sharing'],priority:'medium',status:'idea'},
+  {name:'TowerMaster',cat:'Games',desc:'Idle tower defense with deep strategic depth and satisfying progression curves.',rev:'$60k–150k',aud:'Strategy game fans',feats:['Idle mechanics','Deep strategy','100+ levels','No energy gates'],priority:'medium',status:'idea'},
+  {name:'FitQuest',cat:'Games',desc:'RPG where real-world exercise earns in-game XP, turning fitness into an adventure.',rev:'$50k–130k',aud:'Casual gamers who want to get fit',feats:['Exercise = XP','Dungeon battles','Gear collection','Friend challenges'],priority:'high',status:'idea'},
+  {name:'BrainWars 2',cat:'Games',desc:'Real-time multiplayer brain challenge game across 10 cognitive skill categories.',rev:'$40k–100k',aud:'Competitive puzzle fans',feats:['10 mini-games','Real-time 1v1','ELO ranking','Daily streaks'],priority:'medium',status:'idea'},
+  {name:'PixelFarm',cat:'Games',desc:'Relaxing pixel-art farming simulator with seasonal events and cozy multiplayer.',rev:'$40k–100k',aud:'Casual cozy gamers',feats:['Farming simulation','Seasonal events','Cozy multiplayer','No energy timers'],priority:'medium',status:'idea'},
+  {name:'TriviaBattle',cat:'Games',desc:'Live trivia show with cash prizes, hosted multiple times daily.',rev:'$80k–200k',aud:'Trivia fans aged 18–45',feats:['Live trivia shows','Cash prizes','Category customization','Streaks & bonuses'],priority:'high',status:'idea'},
+  {name:'RaceKing',cat:'Games',desc:'Asynchronous 3D racing game with track creator and social ghost racing.',rev:'$50k–130k',aud:'Casual racing fans',feats:['Ghost racing','Track creator','Weekly cups','Customizable cars'],priority:'medium',status:'idea'},
+  {name:'MatchMaster',cat:'Games',desc:'Premium puzzle game with 500+ handcrafted levels and no energy gates.',rev:'$30k–80k',aud:'Casual puzzle lovers',feats:['500+ levels','No energy gates','Daily challenge','Offline play'],priority:'medium',status:'idea'},
+  {name:'DungeonDice',cat:'Games',desc:'Roguelike dungeon crawler where combat is resolved through strategic dice mechanics.',rev:'$25k–70k',aud:'Tabletop RPG fans',feats:['Dice-based combat','Roguelike progression','Custom character builds','Offline play'],priority:'low',status:'idea'},
+  {name:'CodeRacer',cat:'Games',desc:'Typing speed game themed around coding, great for programmers wanting to improve.',rev:'$15k–40k',aud:'Developers and CS students',feats:['Code snippet typing','Language themes','Global leaderboard','Custom challenges'],priority:'low',status:'idea'},
+  {name:'ZenPuzzles',cat:'Games',desc:'Mindfulness-driven puzzle game with ambient sounds, no failure states, fully offline.',rev:'$20k–60k',aud:'Stressed adults seeking relaxation',feats:['Calming puzzles','Ambient soundscapes','No fail state','Offline'],priority:'low',status:'idea'},
+  {name:'SportSim',cat:'Games',desc:'Deep sports management simulator with real-time results and fantasy league integration.',rev:'$40k–100k',aud:'Sports management fans',feats:['Team management','Live results','Transfer market','Multi-sport'],priority:'medium',status:'idea'},
+  {name:'ArcadeVault',cat:'Games',desc:'Collection of 50+ classic arcade-style games, one subscription, no ads.',rev:'$30k–80k',aud:'Retro gamers aged 25–45',feats:['50+ arcade games','No ads','Offline play','Global leaderboards'],priority:'medium',status:'idea'},
+  {name:'BattleCards',cat:'Games',desc:'Strategic card game with physical-to-digital card scanning and tournament play.',rev:'$50k–150k',aud:'Card game enthusiasts',feats:['Card collection','Physical card scan','Online tournaments','Deck builder'],priority:'high',status:'idea'},
+  {name:'EscapeRoom',cat:'Games',desc:'Weekly new escape room puzzle experiences with global solve-time leaderboards.',rev:'$25k–70k',aud:'Puzzle and escape room fans',feats:['Weekly new rooms','Hint system','Solve-time ranking','Multiplayer co-op'],priority:'medium',status:'idea'},
+  {name:'AnimalCrossed',cat:'Games',desc:'Mobile creature collecting and breeding game with real-time seasonal events.',rev:'$80k–200k',aud:'Casual collectors and cozy gamers',feats:['200+ creatures','Breeding system','Seasonal events','Social island visits'],priority:'high',status:'idea'},
+  {name:'PhysicsLab',cat:'Games',desc:'Creative physics sandbox with sharing, challenges and a construction toolkit.',rev:'$20k–60k',aud:'Creative and tinkering gamers',feats:['Physics sandbox','Challenge creator','Share creations','No fail state'],priority:'low',status:'idea'},
+  {name:'HistoryQuest',cat:'Games',desc:'Educational RPG set in historical periods, learning history through gameplay.',rev:'$30k–80k',aud:'History buffs and educators',feats:['Historical accuracy','RPG progression','Teacher mode','Curriculum-aligned'],priority:'medium',status:'idea'},
+  {name:'GolfNow',cat:'Games',desc:'Precision golf simulation with real-world course replicas and global leaderboards.',rev:'$30k–80k',aud:'Golf enthusiasts',feats:['Real course replicas','Swing physics','Golf bag customization','Weekly tournaments'],priority:'low',status:'idea'},
+  // MUSIC (10)
+  {name:'BeatMaker AI',cat:'Music',desc:'AI-assisted beat creation app that generates full instrumentals from text prompts.',rev:'$80k–200k',aud:'Amateur music producers',feats:['AI beat generation','Loop library','Export to DAW','Social sharing'],priority:'high',status:'idea'},
+  {name:'LyricsFlow',cat:'Music',desc:'AI lyric writing assistant with rhyme suggestions, syllable counter and genre styles.',rev:'$40k–100k',aud:'Songwriters and rappers',feats:['AI lyric suggestions','Rhyme dictionary','Syllable counter','Genre templates'],priority:'medium',status:'idea'},
+  {name:'ChordPro',cat:'Music',desc:'Ultimate chord sheet manager and transposer for musicians performing live.',rev:'$20k–60k',aud:'Gigging musicians',feats:['Chord sheet library','Auto-transpose','Scroll teleprompter','Setlist manager'],priority:'medium',status:'idea'},
+  {name:'EarTrainer',cat:'Music',desc:'Music theory and ear training app gamified for all skill levels.',rev:'$30k–80k',aud:'Music students',feats:['Interval training','Chord recognition','Perfect pitch test','Theory lessons'],priority:'low',status:'idea'},
+  {name:'SoundBit',cat:'Music',desc:'60-second music collaboration app where creators layer tracks asynchronously.',rev:'$30k–80k',aud:'Casual music creators on social media',feats:['60s track limit','Layer system','Social feed','Collab matching'],priority:'high',status:'idea'},
+  {name:'DJPocket',cat:'Music',desc:'Professional DJ mixing app with waveform display and BPM sync.',rev:'$40k–100k',aud:'Amateur and professional DJs',feats:['4-deck mixer','BPM sync','Loop & FX','Streaming library integration'],priority:'medium',status:'idea'},
+  {name:'MetronomePro',cat:'Music',desc:'Advanced metronome with time signatures, polyrhythm and practice session tracking.',rev:'$10k–30k',aud:'Practicing musicians',feats:['Complex time signatures','Polyrhythm mode','Tap tempo','Practice log'],priority:'low',status:'idea'},
+  {name:'VocalCoach',cat:'Music',desc:'AI vocal training app analyzing pitch accuracy and suggesting exercises.',rev:'$50k–130k',aud:'Singers and aspiring vocalists',feats:['Pitch analysis','Vocal warm-ups','Range test','Lesson library'],priority:'medium',status:'idea'},
+  {name:'PlayAlong',cat:'Music',desc:'Sheet music reader and play-along app synced to any audio track.',rev:'$20k–60k',aud:'Instrumentalists learning new pieces',feats:['PDF sheet music sync','Speed control','Measure loop','Instrument tracks'],priority:'low',status:'idea'},
+  {name:'MusicHistory',cat:'Music',desc:'Interactive music history timeline app exploring how genres evolved.',rev:'$10k–30k',aud:'Music lovers and educators',feats:['Interactive timeline','Artist stories','Genre evolution map','Song examples'],priority:'low',status:'idea'},
+  // TOOLS (10)
+  {name:'FocusBlock',cat:'Tools',desc:'Deep work tool with website blocker, Pomodoro timer and productivity analytics.',rev:'$30k–90k',aud:'Remote workers and students',feats:['Site blocker','Pomodoro timer','Focus analytics','Distraction log'],priority:'high',status:'idea'},
+  {name:'ReceiptScan',cat:'Tools',desc:'Receipt scanner and expense reporter using OCR with automatic categorization.',rev:'$25k–70k',aud:'Business travelers and freelancers',feats:['OCR receipt scan','Auto-categorize','Export to CSV/PDF','Team sharing'],priority:'medium',status:'idea'},
+  {name:'MeetingNotes AI',cat:'Tools',desc:'AI meeting transcription and action item extraction from phone audio.',rev:'$60k–180k',aud:'Professionals in meetings',feats:['Live transcription','Action item extraction','Summary email','Integration with calendar'],priority:'high',status:'idea'},
+  {name:'FileVault',cat:'Tools',desc:'Encrypted local-first document vault with zero-knowledge cloud backup.',rev:'$20k–60k',aud:'Privacy-conscious professionals',feats:['Local encryption','Zero-knowledge backup','Doc scanner','Secure share'],priority:'medium',status:'idea'},
+  {name:'TextExpander Lite',cat:'Tools',desc:'Text snippet manager and auto-complete tool for repetitive typing.',rev:'$15k–50k',aud:'Heavy keyboard users and writers',feats:['Snippet library','Auto-complete','Cross-device sync','Variable templates'],priority:'low',status:'idea'},
+  {name:'CalendarBlock',cat:'Tools',desc:'Time-blocking calendar that auto-schedules tasks based on priorities and energy levels.',rev:'$30k–80k',aud:'Knowledge workers',feats:['Time blocking','Energy-aware scheduling','Task integration','Weekly review'],priority:'medium',status:'idea'},
+  {name:'AnnotatePDF',cat:'Tools',desc:'PDF annotator with handwriting recognition and collaborative commenting.',rev:'$20k–60k',aud:'Students and academics',feats:['PDF annotation','Handwriting recognition','Collaborative comments','Cloud sync'],priority:'low',status:'idea'},
+  {name:'DevDocs Offline',cat:'Tools',desc:'Offline developer documentation browser with search across 200+ languages and frameworks.',rev:'$10k–30k',aud:'Software developers',feats:['200+ doc sets','Offline access','Fuzzy search','Bookmarks & history'],priority:'low',status:'idea'},
+  {name:'NetworkMonitor',cat:'Tools',desc:'Home network performance tracker showing speed, connected devices and usage.',rev:'$15k–40k',aud:'Home network owners',feats:['Speed test history','Device manager','Usage monitor','Alerts'],priority:'low',status:'idea'},
+  {name:'ClipBoard Pro',cat:'Tools',desc:'Advanced clipboard manager with search, categories and cross-device sync.',rev:'$10k–30k',aud:'Power users and developers',feats:['Clipboard history','Smart search','Categories','Cross-device sync'],priority:'low',status:'idea'},
+  // EDUCATION (10)
+  {name:'CodeKids',cat:'Education',desc:'Visual coding app for children aged 7–13, teaching programming through puzzles.',rev:'$50k–150k',aud:'Parents of tech-curious kids',feats:['Visual coding blocks','Age-appropriate puzzles','Project gallery','Parent progress'],priority:'high',status:'idea'},
+  {name:'FlashAI',cat:'Education',desc:'AI flashcard generator that turns any text or PDF into study cards automatically.',rev:'$40k–100k',aud:'Students aged 14–25',feats:['AI card generation','Spaced repetition','PDF import','Group decks'],priority:'high',status:'idea'},
+  {name:'DebateCoach',cat:'Education',desc:'AI debate partner teaching argumentation, logical fallacies and public speaking.',rev:'$25k–70k',aud:'Students and professionals',feats:['AI debate partner','Fallacy detector','Speech timer','Rebuttal suggestions'],priority:'medium',status:'idea'},
+  {name:'TypeFast',cat:'Education',desc:'Gamified typing tutor with real-world document typing and speed analytics.',rev:'$15k–40k',aud:'Students and office workers',feats:['Lesson curriculum','Real document typing','WPM analytics','Custom texts'],priority:'low',status:'idea'},
+  {name:'MapMaster',cat:'Education',desc:'Interactive geography learning app with blank map quizzes and country profiles.',rev:'$20k–60k',aud:'Geography students and trivia fans',feats:['Blank map quizzes','Country profiles','Flags & capitals','Streaks'],priority:'low',status:'idea'},
+  {name:'LanguagePartner',cat:'Education',desc:'AI conversation partner for language learners practicing speaking and comprehension.',rev:'$50k–150k',aud:'Language learners',feats:['AI conversation','Pronunciation feedback','Vocabulary review','Cultural context'],priority:'high',status:'idea'},
+  {name:'ScienceKit',cat:'Education',desc:'AR science experiments app simulating real lab experiments on your phone.',rev:'$30k–80k',aud:'Middle and high school students',feats:['AR lab simulations','Guided experiments','Quiz mode','Teacher dashboard'],priority:'medium',status:'idea'},
+  {name:'ReadingBoost',cat:'Education',desc:'Speed reading trainer that doubles reading speed while improving comprehension.',rev:'$20k–60k',aud:'Students and professionals',feats:['RSVP training','Comprehension tests','Progress tracking','Difficulty levels'],priority:'medium',status:'idea'},
+  {name:'HistoryMaps',cat:'Education',desc:'Interactive historical atlas showing how borders, empires and civilizations changed over time.',rev:'$15k–50k',aud:'History enthusiasts and students',feats:['Animated historical maps','Era filter','Battle locations','Documentary links'],priority:'low',status:'idea'},
+  {name:'StudyTimer',cat:'Education',desc:'Study session timer with subject tracking, break management and weekly study reports.',rev:'$10k–30k',aud:'Students',feats:['Subject tracking','Pomodoro integration','Weekly reports','Streak rewards'],priority:'low',status:'idea'},
 ];
 
-function revToPriority(rev) {
-  if (/\$[1-9]\d*M/.test(rev)) return 'high';
-  if (/\$[2-9]\d{2}k/.test(rev) || /\$1M/.test(rev)) return 'medium';
-  return 'low';
-}
+let projects=[],notes={},prefs={theme:'dark',sort:'revenue'},favs=new Set(),activeId=null;
+let filters={cats:[],status:[],diff:[],favOnly:false,query:'',minDaily:0,sort:'revenue'};
 
-// Seed sample data if empty or outdated seed
-const storedSeedVer = (function(){ try{return localStorage.getItem('projecthub_seed')||'';}catch{return '';} })();
-if (projects.length === 0 || storedSeedVer !== SEED_VERSION) {
-  // keep any user-added projects (not idea-status from old seed)
-  const userProjects = storedSeedVer ? projects.filter(p => p._user) : [];
-  if (userProjects.length > 0) projects = userProjects;
-  const now = Date.now();
-  projects = APP_IDEAS.map((row, i) => {
-    const [cat, , rev, name, desc, dau, drawback, fix, tech] = row;
-    return {
-      id: uid(),
-      name,
-      description: desc,
-      status: 'idea',
-      priority: revToPriority(rev),
-      progress: 0,
-      tech,
-      tags: [cat.toLowerCase().replace(/\s+&\s+/g,'-').replace(/\s+/g,'-'), 'app-idea', 'admob', 'mobile'],
-      goals: fix,
-      startDate: '', targetDate: '',
-      url: '', live: '',
-      milestones: [
-        {id:uid(),text:'Research competitors on Sensor Tower',done:false},
-        {id:uid(),text:'Build MVP',done:false},
-        {id:uid(),text:'Submit to Play Store',done:false},
-        {id:uid(),text:'Reach $100/day',done:false}
-      ],
-      resources: [{id:uid(),label:'Est. monthly revenue (top apps): '+rev,url:'https://sensortower.com'},{id:uid(),label:'DAU needed: '+dau,url:'https://www.appodeal.com/the-mobile-ecpm-report-updated-q4-2024-view'}],
-      history: [{date:new Date(now - (APP_IDEAS.length-i)*3600000).toISOString(),note:'Imported from App Ideas research list'}],
-      notes_meta: {drawback},
-      createdAt: new Date(now - (APP_IDEAS.length-i)*3600000).toISOString(),
-      updatedAt: new Date(now - (APP_IDEAS.length-i)*3600000).toISOString()
-    };
+function loadData(){
+  const seeded=localStorage.getItem(SEED_KEY);
+  if(seeded!==SEED_VER){
+    projects=SEED_APPS.map((a,i)=>({...a,id:'s'+i,createdAt:Date.now()-i*1000}));
+    localStorage.setItem(SK,JSON.stringify(projects));
+    localStorage.setItem(SEED_KEY,SEED_VER);
+  }else{
+    try{projects=JSON.parse(localStorage.getItem(SK)||'[]')}catch{projects=[]}
+  }
+  try{notes=JSON.parse(localStorage.getItem(NK)||'{}')}catch{notes={}}
+  try{prefs=JSON.parse(localStorage.getItem(PK)||'{}')}catch{prefs={}}
+  try{favs=new Set(JSON.parse(localStorage.getItem(FK)||'[]'))}catch{favs=new Set()}
+  document.documentElement.dataset.theme=prefs.theme||'dark';
+  filters.sort=prefs.sort||'revenue';
+  document.getElementById('sortSel').value=filters.sort;
+}
+function saveProjects(){localStorage.setItem(SK,JSON.stringify(projects))}
+function saveFavs(){localStorage.setItem(FK,JSON.stringify([...favs]))}
+function saveNotes(){localStorage.setItem(NK,JSON.stringify(notes))}
+function savePrefs(){localStorage.setItem(PK,JSON.stringify(prefs))}
+
+function buildSidebar(){
+  // Categories
+  const cf=document.getElementById('catFilters');
+  cf.innerHTML='<button class="filter-btn active" onclick="toggleCat(null,this)"><span>🌐</span> All categories<span class="cnt" id="cnt-all">'+projects.length+'</span></button>';
+  Object.entries(CAT).forEach(([name,c])=>{
+    const count=projects.filter(p=>p.cat===name).length;
+    if(!count)return;
+    const btn=document.createElement('button');
+    btn.className='filter-btn';
+    btn.innerHTML=`<span class="cat-dot" style="background:${c.color}"></span>${c.emoji} ${name}<span class="cnt">${count}</span>`;
+    btn.onclick=()=>toggleCat(name,btn);
+    cf.appendChild(btn);
   });
-  saveProjects(projects);
-  notes = [
-    { id: uid(), text: 'Imported 60 app ideas from research. All target ~$100/day with AdMob. Focus on categories with high eCPM: Finance, Health, Education.', projectId: null, createdAt: new Date().toISOString() },
-    { id: uid(), text: 'Best quick wins: Document Scanner, PDF tools and Intermittent Fasting Timer — proven $1M+/mo markets with clear UX gaps to fill.', projectId: null, createdAt: new Date().toISOString() }
-  ];
-  saveNotes(notes);
-  try{localStorage.setItem('projecthub_seed', SEED_VERSION);}catch{}
+  // Diffs
+  const df=document.getElementById('diffFilters');
+  df.innerHTML='';
+  DIFFS.forEach(d=>{
+    const btn=document.createElement('button');
+    btn.className='filter-btn';
+    btn.textContent=d;
+    btn.onclick=()=>{
+      btn.classList.toggle('active');
+      const i=filters.diff.indexOf(d);
+      if(i>-1)filters.diff.splice(i,1);else filters.diff.push(d);
+      render();
+    };
+    df.appendChild(btn);
+  });
+  // Status
+  const sf=document.getElementById('statusFilters');
+  sf.innerHTML='';
+  STATUSES.forEach(s=>{
+    const btn=document.createElement('button');
+    btn.className='filter-btn';
+    btn.textContent=STATUS_TEXT[s];
+    btn.onclick=()=>{
+      btn.classList.toggle('active');
+      const i=filters.status.indexOf(s);
+      if(i>-1)filters.status.splice(i,1);else filters.status.push(s);
+      render();
+    };
+    sf.appendChild(btn);
+  });
+  // Add cats to add form
+  const fCat=document.getElementById('fCat');
+  Object.keys(CAT).forEach(c=>{
+    const o=document.createElement('option');
+    o.value=c;o.textContent=c;
+    fCat.appendChild(o);
+  });
+}
+function toggleCat(name,btn){
+  document.querySelectorAll('#catFilters .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filters.cats=name?[name]:[];
+  render();
+}
+function toggleFav(){
+  filters.favOnly=!filters.favOnly;
+  document.getElementById('favToggle').classList.toggle('active',filters.favOnly);
+  render();
+}
+function setDaily(v){filters.minDaily=parseFloat(v)||0;render()}
+function setSort(v){filters.sort=v;prefs.sort=v;savePrefs();render()}
+
+function getFiltered(){
+  let r=[...projects];
+  if(filters.cats.length)r=r.filter(p=>filters.cats.includes(p.cat));
+  if(filters.status.length)r=r.filter(p=>filters.status.includes(p.status));
+  if(filters.diff.length)r=r.filter(p=>filters.diff.includes(getDiff(p.rev).label));
+  if(filters.favOnly)r=r.filter(p=>favs.has(p.id));
+  if(filters.minDaily>0)r=r.filter(p=>getEarnings(p.rev).daily>=filters.minDaily);
+  if(filters.query){
+    const q=filters.query.toLowerCase();
+    r=r.filter(p=>(p.name+' '+p.desc+' '+p.cat).toLowerCase().includes(q));
+  }
+  const s=filters.sort;
+  r.sort((a,b)=>{
+    if(s==='revenue')return parseMonthly(b.rev)-parseMonthly(a.rev);
+    if(s==='daily')return getEarnings(b.rev).daily-getEarnings(a.rev).daily;
+    if(s==='diff_easy')return getDiff(b.rev).pct-getDiff(a.rev).pct;
+    if(s==='diff_hard')return getDiff(a.rev).pct-getDiff(b.rev).pct;
+    if(s==='name')return a.name.localeCompare(b.name);
+    if(s==='status')return STATUSES.indexOf(a.status)-STATUSES.indexOf(b.status);
+    return 0;
+  });
+  return r;
 }
 
-function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// STATE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let filters = { status: 'all', priority: 'all', tags: [], tech: [], dateFrom: '', dateTo: '' };
-let sortBy = prefs.sortBy || 'updated';
-let viewMode = prefs.viewMode || 'grid';
-let noteTab = 'global';
-let activeProjectId = null; // for project notes tab
-let filterOpen = prefs.filterOpen !== false;
-let notesOpen  = prefs.notesOpen !== false;
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// FILTER + SORT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function getFiltered() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  return projects
-    .filter(p => {
-      if (filters.status !== 'all' && p.status !== filters.status) return false;
-      if (filters.priority !== 'all' && p.priority !== filters.priority) return false;
-      if (filters.tags.length && !filters.tags.every(t => p.tags && p.tags.includes(t))) return false;
-      if (filters.tech.length && !filters.tech.every(t => p.tech && p.tech.includes(t))) return false;
-      if (filters.dateFrom && p.startDate && p.startDate < filters.dateFrom) return false;
-      if (filters.dateTo   && p.startDate && p.startDate > filters.dateTo)   return false;
-      if (q) {
-        const hay = [p.name, p.description, ...(p.tags||[]), ...(p.tech||[])].join(' ').toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
-      return true;
-    })
-    .sort((a, b) => {
-      if (sortBy === 'name')     return a.name.localeCompare(b.name);
-      if (sortBy === 'created')  return new Date(b.createdAt) - new Date(a.createdAt);
-      if (sortBy === 'progress') return b.progress - a.progress;
-      if (sortBy === 'priority') {
-        const ord = {critical:0,high:1,medium:2,low:3};
-        return (ord[a.priority]||3) - (ord[b.priority]||3);
-      }
-      return new Date(b.updatedAt) - new Date(a.updatedAt);
-    });
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// RENDER CARDS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const statusDot = { active: '#22c55e', paused: '#f59e0b', done: '#6366f1', idea: '#8b5cf6' };
-const priorityColor = { critical: '#ef4444', high: '#f97316', medium: '#eab308', low: '#22c55e' };
-const priorityLabel = { critical: '🔴 Critical', high: '🟠 High', medium: '🟡 Medium', low: '🟢 Low' };
-
-function renderGrid() {
-  const grid = document.getElementById('projectGrid');
-  const filtered = getFiltered();
-  document.getElementById('projectCount').textContent = `${filtered.length} project${filtered.length !== 1 ? 's' : ''}`;
-  updateFilterCounts();
-
-  if (filtered.length === 0) {
-    grid.innerHTML = `<div class="empty-state">
-      <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/></svg>
-      <h3>No projects found</h3>
-      <p>Try adjusting your filters or search.</p>
-      <button class="btn btn-primary" onclick="openAddModal()">New Project</button>
-    </div>`;
+function render(){
+  const list=getFiltered();
+  document.getElementById('countBadge').textContent=list.length+' app'+(list.length!==1?'s':'');
+  const grid=document.getElementById('grid');
+  if(!list.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1"><h3>No apps found</h3><p>Try adjusting your filters</p></div>';
     return;
   }
-
-  grid.innerHTML = filtered.map(p => cardHTML(p)).join('');
+  grid.innerHTML=list.map(p=>renderCard(p)).join('');
+  updateHeaderStats();
 }
-
-function cardHTML(p) {
-  const tags = (p.tags||[]).slice(0,3).map(t => `<span class="tag">${esc(t)}</span>`).join('');
-  const techChips = (p.tech||[]).slice(0,3).map(t => `<span class="tag">${esc(t)}</span>`).join('');
-  const isFull = p.progress === 100;
-  const noteCount = notes.filter(n => n.projectId === p.id).length;
-  return `<div class="project-card" data-id="${p.id}" onclick="openDetail('${p.id}')">
-    <div class="card-top">
-      <div class="card-stripe ${stripeClass(p.priority)}"></div>
-      <div class="card-main">
-        <div class="card-title">${esc(p.name)}</div>
-        ${p.description ? `<div class="card-desc">${esc(p.description)}</div>` : ''}
+function renderCard(p){
+  const c=CAT[p.cat]||{emoji:'📱',color:'#6366f1',bg:'linear-gradient(135deg,#312e81,#3730a3)'};
+  const e=getEarnings(p.rev);
+  const d=getDiff(p.rev);
+  const isFav=favs.has(p.id);
+  const tags=(p.feats||[]).slice(0,3);
+  const sc=STATUS_COLORS[p.status]||STATUS_COLORS.idea;
+  const st=STATUS_TEXT[p.status]||STATUS_TEXT.idea;
+  return`<div class="card" onclick="openDetail('${p.id}')">
+    <div class="card-header" style="background:${c.bg}">
+      <div class="card-emoji">${c.emoji}</div>
+      <div class="card-title-wrap">
+        <div class="card-name">${esc(p.name)}</div>
+        <div class="card-cat" style="color:${c.color}">${p.cat}</div>
       </div>
+      <button class="fav-btn" onclick="event.stopPropagation();toggleFavItem('${p.id}')">${isFav?'❤️':'🤍'}</button>
     </div>
-    <div class="card-meta">
-      <span class="badge badge-status-${p.status}">${p.status.charAt(0).toUpperCase()+p.status.slice(1)}</span>
-      <span class="badge badge-priority-${p.priority}">${priorityLabel[p.priority]||p.priority}</span>
-      ${noteCount > 0 ? `<span style="font-size:11px;color:var(--fg-3);margin-left:auto">📝 ${noteCount}</span>` : ''}
-    </div>
-    ${tags ? `<div class="card-tags">${tags}</div>` : ''}
-    <div class="card-footer">
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--fg-3);margin-bottom:4px">
-          <span>${techChips}</span>
-          <span style="font-variant-numeric:tabular-nums">${p.progress}%</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill ${isFull?'done':''}" style="width:${p.progress}%"></div>
-        </div>
+    <div class="card-body">
+      <div class="card-desc">${esc(p.desc||'')}</div>
+      <div class="earn-row">
+        <div class="earn-cell"><small>Daily</small><b style="color:${c.color}">${e.d}</b></div>
+        <div class="earn-cell"><small>Weekly</small><b>${e.w}</b></div>
+        <div class="earn-cell"><small>Monthly</small><b>${e.m}</b></div>
       </div>
-      <span class="card-date">${formatDate(p.updatedAt)}</span>
+      <div class="diff-row">
+        <span class="diff-label" style="color:${d.color}">${d.label}</span>
+        <div class="diff-bar"><div class="diff-fill" style="width:${d.pct}%;background:${d.color}"></div></div>
+        <span class="diff-pct">${d.pct}%</span>
+      </div>
+      <div class="tags">${tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
     </div>
+    <span class="status-badge" style="background:${sc}" onclick="event.stopPropagation();cycleStatus('${p.id}')">${st}</span>
   </div>`;
 }
 
-function stripeClass(pr) {
-  return {critical:'stripe-critical',high:'stripe-high',medium:'stripe-medium',low:'stripe-low'}[pr]||'stripe-low';
+function toggleFavItem(id){
+  if(favs.has(id))favs.delete(id);else favs.add(id);
+  saveFavs();
+  render();
+}
+function cycleStatus(id){
+  const p=projects.find(x=>x.id===id);
+  if(!p)return;
+  const i=STATUSES.indexOf(p.status);
+  p.status=STATUSES[(i+1)%STATUSES.length];
+  saveProjects();render();toast('Status → '+STATUS_TEXT[p.status]);
 }
 
-function esc(s) {
-  if (!s) return '';
+function updateHeaderStats(){
+  const all=getFiltered();
+  const totalMo=all.reduce((s,p)=>s+parseMonthly(p.rev),0)/all.length||0;
+  const launched=projects.filter(p=>p.status==='launched').length;
+  const favCount=projects.filter(p=>favs.has(p.id)).length;
+  const fmt=n=>n>=1000000?'$'+(n/1000000).toFixed(1)+'M':n>=1000?'$'+(n/1000).toFixed(0)+'k':'$'+Math.round(n);
+  document.getElementById('headerStats').innerHTML=`
+    <div class="hstat"><b>${projects.length}</b><small>Total Apps</small></div>
+    <div class="hstat"><b>${launched}</b><small>Launched</small></div>
+    <div class="hstat"><b>${favCount}</b><small>Favorites</small></div>
+    <div class="hstat"><b>${fmt(totalMo)}</b><small>Avg Revenue</small></div>
+  `;
+}
+
+// DETAIL MODAL
+function openDetail(id){
+  const p=projects.find(x=>x.id===id);
+  if(!p)return;
+  activeId=id;
+  const c=CAT[p.cat]||{emoji:'📱',color:'#6366f1'};
+  const e=getEarnings(p.rev);
+  const d=getDiff(p.rev);
+  document.getElementById('mEmoji').textContent=c.emoji;
+  document.getElementById('mName').textContent=p.name;
+  document.getElementById('mMeta').textContent=p.cat+' · '+d.label+' · '+(p.status||'idea');
+  // Tabs
+  const tabs=['Overview','Competitors','Build Guide','Notes'];
+  document.getElementById('modalTabs').innerHTML=tabs.map((t,i)=>
+    `<button class="tab${i===0?' active':''}" onclick="switchTab(${i},this)">${t}</button>`
+  ).join('');
+  // Body
+  renderTabContent(0,p,e,d,c);
+  document.getElementById('detailOverlay').classList.add('open');
+}
+function switchTab(idx,btn){
+  document.querySelectorAll('#modalTabs .tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  const p=projects.find(x=>x.id===activeId);
+  const c=CAT[p.cat]||{emoji:'📱',color:'#6366f1'};
+  const e=getEarnings(p.rev);
+  const d=getDiff(p.rev);
+  renderTabContent(idx,p,e,d,c);
+}
+function renderTabContent(idx,p,e,d,c){
+  const body=document.getElementById('modalBody');
+  if(idx===0){
+    body.innerHTML=`
+      <div class="earn-big">
+        <div class="section-title">💰 Revenue Potential</div>
+        <div class="earn-big-row">
+          <div class="earn-big-cell"><small>Daily</small><b style="color:${c.color}">${e.d}</b></div>
+          <div class="earn-big-cell"><small>Weekly</small><b>${e.w}</b></div>
+          <div class="earn-big-cell"><small>Monthly</small><b>${e.m}</b></div>
+        </div>
+      </div>
+      <div class="overview-grid">
+        <div class="info-card"><label>Category</label><div class="val">${c.emoji} ${p.cat}</div></div>
+        <div class="info-card"><label>Competition</label><div class="val" style="color:${d.color}">${d.label} (${d.pct}% chance)</div></div>
+        <div class="info-card"><label>Target Audience</label><div class="val">${esc(p.aud||'—')}</div></div>
+        <div class="info-card"><label>Priority</label><div class="val">${p.priority||'medium'}</div></div>
+      </div>
+      <div class="section-title">📋 Description</div>
+      <p style="font-size:14px;line-height:1.7;color:var(--text2);margin-bottom:16px">${esc(p.desc||'')}</p>
+      <div class="section-title">⚡ Key Features</div>
+      <ul style="margin-left:16px">${(p.feats||[]).map(f=>`<li style="font-size:14px;color:var(--text2);margin-bottom:4px">${esc(f)}</li>`).join('')}</ul>
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="editModal()">✏️ Edit</button>
+        <button class="btn btn-ghost" onclick="toggleFavItem('${p.id}');renderTabContent(0,projects.find(x=>x.id==='${p.id}'),getEarnings(projects.find(x=>x.id==='${p.id}').rev),getDiff(projects.find(x=>x.id==='${p.id}').rev),CAT[projects.find(x=>x.id==='${p.id}').cat]||{emoji:'📱',color:'#6366f1'})">${favs.has(p.id)?'💔 Unfavorite':'❤️ Favorite'}</button>
+        <button class="btn btn-danger" style="margin-left:auto" onclick="deleteApp('${p.id}')">🗑️ Delete</button>
+      </div>
+    `;
+  }else if(idx===1){
+    const comps=(COMPS[p.cat]||[]);
+    body.innerHTML=`<div class="section-title">🔍 Competitor Analysis — ${p.cat}</div>
+      <div class="comp-grid">${comps.map(comp=>`
+        <div class="comp-card">
+          <div class="comp-top">
+            <div class="comp-icon" style="background:${comp.color}20;color:${comp.color}">${comp.icon}</div>
+            <div><div class="comp-name">${esc(comp.name)}</div><div class="comp-rating">★ ${comp.rating}</div></div>
+          </div>
+          <div class="comp-stats">
+            <div class="comp-stat"><small>Downloads</small><b>${comp.downloads}</b></div>
+            <div class="comp-stat"><small>Revenue</small><b>${comp.rev}</b></div>
+          </div>
+          <div class="comp-features"><ul>${comp.features.map(f=>`<li>${esc(f)}</li>`).join('')}</ul></div>
+          <div class="opp-box">🎯 ${esc(comp.opp)}</div>
+        </div>
+      `).join('')}</div>`;
+  }else if(idx===2){
+    const steps=getBuildGuide(p.cat);
+    body.innerHTML=`<div class="section-title">🏗️ Build Guide — ${p.name}</div>
+      <div class="build-steps">${steps.map((s,i)=>`
+        <div class="build-step">
+          <div class="step-num">${i+1}</div>
+          <div class="step-body"><h4>${esc(s.title)}</h4><p>${esc(s.desc)}</p></div>
+        </div>
+      `).join('')}</div>`;
+  }else{
+    const note=notes[p.id]||'';
+    body.innerHTML=`<div class="section-title">📝 Notes for ${esc(p.name)}</div>
+      <textarea class="notes-area" id="noteArea" placeholder="Write your notes here…">${esc(note)}</textarea>
+      <div class="btn-row"><button class="btn btn-primary" onclick="saveNote()">Save Notes</button></div>`;
+  }
+}
+function saveNote(){
+  const p=projects.find(x=>x.id===activeId);
+  if(!p)return;
+  notes[activeId]=document.getElementById('noteArea').value;
+  saveNotes();toast('Notes saved!');
+}
+function deleteApp(id){
+  if(!confirm('Delete this app idea?'))return;
+  projects=projects.filter(p=>p.id!==id);
+  saveProjects();closeDetailDirect();render();toast('Deleted');
+}
+function editModal(){
+  const p=projects.find(x=>x.id===activeId);
+  if(!p)return;
+  document.getElementById('fName').value=p.name;
+  document.getElementById('fCat').value=p.cat;
+  document.getElementById('fDesc').value=p.desc||'';
+  document.getElementById('fRev').value=p.rev||'';
+  document.getElementById('fAud').value=p.aud||'';
+  document.getElementById('fFeats').value=(p.feats||[]).join(', ');
+  document.getElementById('fNotes').value=notes[activeId]||'';
+  closeDetailDirect();
+  document.getElementById('addOverlay').classList.add('open');
+}
+function closeDetail(e){if(e.target===document.getElementById('detailOverlay'))closeDetailDirect()}
+function closeDetailDirect(){document.getElementById('detailOverlay').classList.remove('open');activeId=null}
+
+// ADD MODAL
+function showAdd(){
+  document.getElementById('fName').value='';
+  document.getElementById('fDesc').value='';
+  document.getElementById('fRev').value='';
+  document.getElementById('fAud').value='';
+  document.getElementById('fFeats').value='';
+  document.getElementById('fNotes').value='';
+  document.getElementById('addOverlay').classList.add('open');
+}
+function closeAdd(e){if(e.target===document.getElementById('addOverlay'))closeAddDirect()}
+function closeAddDirect(){document.getElementById('addOverlay').classList.remove('open')}
+function saveAdd(){
+  const name=document.getElementById('fName').value.trim();
+  const cat=document.getElementById('fCat').value;
+  if(!name||!cat){toast('Name and category required');return}
+  const featsRaw=document.getElementById('fFeats').value;
+  const feats=featsRaw?featsRaw.split(',').map(f=>f.trim()).filter(Boolean):[];
+  const id='u'+Date.now();
+  const p={id,name,cat,
+    desc:document.getElementById('fDesc').value.trim(),
+    rev:document.getElementById('fRev').value.trim(),
+    aud:document.getElementById('fAud').value.trim(),
+    feats,priority:'medium',status:'idea',createdAt:Date.now()};
+  const noteText=document.getElementById('fNotes').value.trim();
+  if(noteText)notes[id]=noteText;
+  projects.unshift(p);
+  saveProjects();saveNotes();
+  closeAddDirect();render();buildSidebar();toast('App added!');
+}
+
+// SEARCH
+document.getElementById('searchInput').addEventListener('input',e=>{
+  filters.query=e.target.value;render();
+});
+
+// THEME
+function toggleTheme(){
+  const t=document.documentElement.dataset.theme==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=t;
+  prefs.theme=t;savePrefs();
+}
+
+// EXPORT / IMPORT
+function exportData(){
+  const data={projects,notes,favs:[...favs]};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='apphub-export.json';a.click();
+  toast('Exported!');
+}
+function importData(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(data.projects)projects=data.projects;
+      if(data.notes)notes=data.notes;
+      if(data.favs)favs=new Set(data.favs);
+      saveProjects();saveNotes();saveFavs();
+      render();buildSidebar();toast('Imported '+projects.length+' apps!');
+    }catch{toast('Invalid JSON file')}
+  };
+  reader.readAsText(file);
+}
+
+// TOAST
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// HELPERS
+function esc(s){
+  if(!s)return'';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function formatDate(iso) {
-  if (!iso) return '';
-  const d = new Date(iso), now = new Date();
-  const diff = now - d;
-  if (diff < 60000) return 'just now';
-  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
-  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
-  if (diff < 7*86400000) return Math.floor(diff/86400000) + 'd ago';
-  return d.toLocaleDateString(undefined, {month:'short',day:'numeric',year:d.getFullYear()!==now.getFullYear()?'numeric':undefined});
-}
-
-function updateFilterCounts() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const count = s => projects.filter(p => {
-    if (s !== 'all' && p.status !== s) return false;
-    if (q) {
-      const hay = [p.name,p.description,...(p.tags||[]),...(p.tech||[])].join(' ').toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
-    return true;
-  }).length;
-  document.getElementById('countAll').textContent    = projects.length;
-  document.getElementById('countActive').textContent = count('active');
-  document.getElementById('countPaused').textContent = count('paused');
-  document.getElementById('countDone').textContent   = count('done');
-  document.getElementById('countIdea').textContent   = count('idea');
-}
-
-function renderTagFilters() {
-  const allTags  = [...new Set(projects.flatMap(p => p.tags||[]))].sort();
-  const allTechs = [...new Set(projects.flatMap(p => p.tech||[]))].sort();
-  document.getElementById('tagFilterList').innerHTML  = allTags.map(t => `<button class="filter-tech-btn ${filters.tags.includes(t)?'active':''}" onclick="toggleTagFilter('${esc(t)}')">${esc(t)}</button>`).join('');
-  document.getElementById('techFilterList').innerHTML = allTechs.map(t => `<button class="filter-tech-btn ${filters.tech.includes(t)?'active':''}" onclick="toggleTechFilter('${esc(t)}')">${esc(t)}</button>`).join('');
-}
-
-function toggleTagFilter(t) {
-  if (filters.tags.includes(t)) filters.tags = filters.tags.filter(x=>x!==t);
-  else filters.tags.push(t);
-  renderTagFilters(); renderGrid();
-}
-function toggleTechFilter(t) {
-  if (filters.tech.includes(t)) filters.tech = filters.tech.filter(x=>x!==t);
-  else filters.tech.push(t);
-  renderTagFilters(); renderGrid();
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// DETAIL MODAL
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function openDetail(id) {
-  const p = projects.find(x => x.id === id);
-  if (!p) return;
-  activeProjectId = id;
-
-  document.getElementById('detailTitle').textContent = p.name;
-  document.getElementById('detailStatusBadge').className = `badge badge-status-${p.status}`;
-  document.getElementById('detailStatusBadge').textContent = p.status.charAt(0).toUpperCase()+p.status.slice(1);
-  document.getElementById('detailPriorityBadge').className = `badge badge-priority-${p.priority}`;
-  document.getElementById('detailPriorityBadge').textContent = priorityLabel[p.priority]||p.priority;
-  document.getElementById('detailTechChips').innerHTML = (p.tech||[]).map(t=>`<span class="tech-chip">${esc(t)}</span>`).join('');
-  document.getElementById('detailEditBtn').onclick = () => { closeModal('detailModal'); openEditModal(id); };
-
-  const milestonesDone = (p.milestones||[]).filter(m=>m.done).length;
-  const milestonesTotal = (p.milestones||[]).length;
-
-  document.getElementById('detailBody').innerHTML = `
-    <div class="detail-section">
-      <h3>Overview</h3>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:12px">
-        ${infoTile('Progress', p.progress+'%')}
-        ${infoTile('Milestones', milestonesTotal ? `${milestonesDone}/${milestonesTotal}` : '—')}
-        ${infoTile('Start', p.startDate || '—')}
-        ${infoTile('Target', p.targetDate || '—')}
-      </div>
-      <div class="progress-track" style="height:8px"><div class="progress-fill ${p.progress===100?'done':''}" style="width:${p.progress}%"></div></div>
-    </div>
-    ${p.description ? `<div class="detail-section"><h3>Description</h3><p class="detail-desc">${esc(p.description)}</p></div>` : ''}
-    ${p.goals ? `<div class="detail-section"><h3>Goals</h3><p class="detail-desc">${esc(p.goals)}</p></div>` : ''}
-    <div class="detail-section">
-      <h3>Milestones</h3>
-      <div class="milestone-list" id="milestoneList">${renderMilestones(p)}</div>
-      <div class="milestone-add">
-        <input id="newMilestone" type="text" placeholder="Add milestone…">
-        <button class="btn btn-outline btn-sm" onclick="addMilestone('${id}')">Add</button>
-      </div>
-    </div>
-    ${(p.tags||[]).length ? `<div class="detail-section"><h3>Tags</h3><div style="display:flex;flex-wrap:wrap;gap:6px">${(p.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div></div>` : ''}
-    <div class="detail-section">
-      <h3>Resources & Links</h3>
-      <div class="resource-list" id="resourceList">${renderResources(p)}</div>
-      <div class="milestone-add" style="gap:4px">
-        <input id="newResLabel" type="text" placeholder="Label" style="flex:.5">
-        <input id="newResUrl"   type="url"  placeholder="URL">
-        <button class="btn btn-outline btn-sm" onclick="addResource('${id}')">Add</button>
-      </div>
-    </div>
-    <div class="detail-section">
-      <h3>Status History</h3>
-      <div class="history-list">${renderHistory(p)}</div>
-    </div>
-    <div class="detail-section" style="border:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <h3 style="margin:0">Quick Note</h3>
-        <button class="btn btn-ghost btn-sm" onclick="openProjectNotes('${id}')">View all notes →</button>
-      </div>
-      <div style="display:flex;gap:6px">
-        <input id="quickNoteInput" type="text" placeholder="Add a quick note for this project…">
-        <button class="btn btn-outline btn-sm" onclick="addQuickNote('${id}')">Add</button>
-      </div>
-    </div>
-    <div style="display:flex;justify-content:flex-end;margin-top:4px">
-      <button class="btn btn-danger btn-sm" onclick="deleteProject('${id}')">Delete project</button>
-    </div>
-  `;
-
-  document.getElementById('detailModal').hidden = false;
-}
-
-function infoTile(label, val) {
-  return `<div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:10px 12px;border:1px solid var(--border)">
-    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-3);margin-bottom:3px">${label}</div>
-    <div style="font-weight:600;font-size:14px;color:var(--fg);font-variant-numeric:tabular-nums">${val}</div>
-  </div>`;
-}
-
-function renderMilestones(p) {
-  return (p.milestones||[]).map(m => `
-    <div class="milestone-item ${m.done?'done':''}">
-      <input type="checkbox" ${m.done?'checked':''} onchange="toggleMilestone('${p.id}','${m.id}',this.checked)">
-      <span>${esc(m.text)}</span>
-      <button onclick="deleteMilestone('${p.id}','${m.id}')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--fg-3);font-size:12px;padding:2px 4px" title="Remove">✕</button>
-    </div>`).join('');
-}
-function renderResources(p) {
-  return (p.resources||[]).map(r => `
-    <div class="resource-item">
-      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      <a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.label||r.url)}</a>
-      <button onclick="deleteResource('${p.id}','${r.id}')" style="background:none;border:none;cursor:pointer;color:var(--fg-3);font-size:12px;padding:2px 4px;margin-left:auto">✕</button>
-    </div>`).join('');
-}
-function renderHistory(p) {
-  return (p.history||[]).slice().reverse().map(h => `
-    <div class="history-item">
-      <div class="history-dot"></div>
-      <span class="history-time">${formatDate(h.date)}</span>
-      <span>${esc(h.note)}</span>
-    </div>`).join('') || '<p style="font-size:12px;color:var(--fg-3)">No history yet.</p>';
-}
-
-// Milestone CRUD
-function toggleMilestone(projId, mId, done) {
-  const p = projects.find(x=>x.id===projId); if (!p) return;
-  const m = (p.milestones||[]).find(x=>x.id===mId); if (!m) return;
-  m.done = done;
-  p.updatedAt = new Date().toISOString();
-  saveProjects(projects); renderGrid();
-  document.getElementById('milestoneList').innerHTML = renderMilestones(p);
-}
-function addMilestone(projId) {
-  const input = document.getElementById('newMilestone');
-  const text = input.value.trim(); if (!text) return;
-  const p = projects.find(x=>x.id===projId); if (!p) return;
-  if (!p.milestones) p.milestones = [];
-  p.milestones.push({id:uid(),text,done:false});
-  p.updatedAt = new Date().toISOString();
-  saveProjects(projects); input.value = '';
-  document.getElementById('milestoneList').innerHTML = renderMilestones(p);
-  renderGrid();
-}
-function deleteMilestone(projId, mId) {
-  const p = projects.find(x=>x.id===projId); if (!p) return;
-  p.milestones = (p.milestones||[]).filter(m=>m.id!==mId);
-  p.updatedAt = new Date().toISOString();
-  saveProjects(projects);
-  document.getElementById('milestoneList').innerHTML = renderMilestones(p);
-  renderGrid();
-}
-function addResource(projId) {
-  const lbl = document.getElementById('newResLabel').value.trim();
-  const url = document.getElementById('newResUrl').value.trim();
-  if (!url) return;
-  const p = projects.find(x=>x.id===projId); if (!p) return;
-  if (!p.resources) p.resources = [];
-  p.resources.push({id:uid(),label:lbl||url,url});
-  p.updatedAt = new Date().toISOString();
-  saveProjects(projects);
-  document.getElementById('newResLabel').value = '';
-  document.getElementById('newResUrl').value = '';
-  document.getElementById('resourceList').innerHTML = renderResources(p);
-}
-function deleteResource(projId, rId) {
-  const p = projects.find(x=>x.id===projId); if (!p) return;
-  p.resources = (p.resources||[]).filter(r=>r.id!==rId);
-  p.updatedAt = new Date().toISOString();
-  saveProjects(projects);
-  document.getElementById('resourceList').innerHTML = renderResources(p);
-}
-function addQuickNote(projId) {
-  const input = document.getElementById('quickNoteInput');
-  const text = input.value.trim(); if (!text) return;
-  notes.push({id:uid(),text,projectId:projId,createdAt:new Date().toISOString()});
-  saveNotes(notes); input.value = '';
-  toast('Note added');
-}
-function openProjectNotes(id) {
-  closeModal('detailModal');
-  noteTab = 'project'; activeProjectId = id;
-  document.querySelectorAll('.note-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='project'));
-  if (notesOpen) renderNotes();
-  else { toggleNotes(); }
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ADD / EDIT MODAL
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function openAddModal() {
-  document.getElementById('projectModalTitle').textContent = 'New Project';
-  document.getElementById('editingId').value = '';
-  clearProjectForm();
-  document.getElementById('projectModal').hidden = false;
-}
-function openEditModal(id) {
-  const p = projects.find(x=>x.id===id); if (!p) return;
-  document.getElementById('projectModalTitle').textContent = 'Edit Project';
-  document.getElementById('editingId').value = id;
-  document.getElementById('pName').value        = p.name||'';
-  document.getElementById('pDesc').value        = p.description||'';
-  document.getElementById('pStatus').value      = p.status||'active';
-  document.getElementById('pPriority').value    = p.priority||'medium';
-  document.getElementById('pStartDate').value   = p.startDate||'';
-  document.getElementById('pTargetDate').value  = p.targetDate||'';
-  document.getElementById('pGoals').value       = p.goals||'';
-  document.getElementById('pTech').value        = (p.tech||[]).join(', ');
-  document.getElementById('pTags').value        = (p.tags||[]).join(', ');
-  document.getElementById('pProgress').value    = p.progress||0;
-  document.getElementById('pUrl').value         = p.url||'';
-  document.getElementById('pLive').value        = p.live||'';
-  document.getElementById('projectModal').hidden = false;
-}
-function clearProjectForm() {
-  ['pName','pDesc','pGoals','pTech','pTags','pUrl','pLive'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('pStatus').value   = 'active';
-  document.getElementById('pPriority').value = 'medium';
-  document.getElementById('pProgress').value = 0;
-  document.getElementById('pStartDate').value = '';
-  document.getElementById('pTargetDate').value = '';
-}
-function saveProject() {
-  const name = document.getElementById('pName').value.trim();
-  if (!name) { alert('Project name is required'); return; }
-  const id = document.getElementById('editingId').value;
-  const oldStatus = id ? (projects.find(x=>x.id===id)||{}).status : null;
-  const newStatus = document.getElementById('pStatus').value;
-  const tech = document.getElementById('pTech').value.split(',').map(s=>s.trim()).filter(Boolean);
-  const tags = document.getElementById('pTags').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-  const now = new Date().toISOString();
-
-  if (id) {
-    const p = projects.find(x=>x.id===id);
-    Object.assign(p, { name, description: document.getElementById('pDesc').value.trim(), status: newStatus, priority: document.getElementById('pPriority').value, goals: document.getElementById('pGoals').value.trim(), tech, tags, progress: parseInt(document.getElementById('pProgress').value)||0, startDate: document.getElementById('pStartDate').value, targetDate: document.getElementById('pTargetDate').value, url: document.getElementById('pUrl').value.trim(), live: document.getElementById('pLive').value.trim(), updatedAt: now });
-    if (oldStatus && oldStatus !== newStatus) {
-      if (!p.history) p.history = [];
-      p.history.push({date:now,note:`Status changed from ${oldStatus} → ${newStatus}`});
-    }
-  } else {
-    const p = { id: uid(), name, description: document.getElementById('pDesc').value.trim(), status: newStatus, priority: document.getElementById('pPriority').value, goals: document.getElementById('pGoals').value.trim(), tech, tags, progress: parseInt(document.getElementById('pProgress').value)||0, startDate: document.getElementById('pStartDate').value, targetDate: document.getElementById('pTargetDate').value, url: document.getElementById('pUrl').value.trim(), live: document.getElementById('pLive').value.trim(), milestones: [], resources: [], history: [{date:now,note:'Project created'}], createdAt: now, updatedAt: now };
-    projects.unshift(p);
-  }
-  saveProjects(projects); renderTagFilters(); renderGrid();
-  closeModal('projectModal');
-  toast(id ? 'Project updated' : 'Project created');
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// DELETE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let _pendingDelete = null;
-function deleteProject(id) {
-  const p = projects.find(x=>x.id===id); if (!p) return;
-  _pendingDelete = id;
-  document.getElementById('confirmTitle').textContent = 'Delete Project';
-  document.getElementById('confirmMsg').textContent = `Delete "${p.name}"? This can't be undone.`;
-  document.getElementById('confirmOkBtn').onclick = () => {
-    projects = projects.filter(x=>x.id!==_pendingDelete);
-    notes = notes.filter(n=>n.projectId!==_pendingDelete);
-    saveProjects(projects); saveNotes(notes);
-    closeModal('confirmModal'); closeModal('detailModal');
-    renderTagFilters(); renderGrid(); renderNotes();
-    toast('Project deleted');
-  };
-  document.getElementById('confirmModal').hidden = false;
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// NOTES
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function renderNotes() {
-  const body = document.getElementById('notesBody');
-  let list;
-  if (noteTab === 'global') {
-    list = notes.filter(n=>!n.projectId);
-  } else {
-    list = notes.filter(n=>n.projectId);
-  }
-  list = list.slice().reverse();
-  if (list.length === 0) {
-    body.innerHTML = `<div style="text-align:center;padding:24px 0;color:var(--fg-3);font-size:12px">No notes yet. Add one below.</div>`;
-    return;
-  }
-  body.innerHTML = list.map(n => {
-    const proj = n.projectId ? projects.find(p=>p.id===n.projectId) : null;
-    return `<div class="note-card">
-      ${proj ? `<div class="note-project-tag">📁 ${esc(proj.name)}</div>` : ''}
-      <div class="note-text">${esc(n.text)}</div>
-      <div class="note-time">${formatDate(n.createdAt)}</div>
-      <button class="note-delete" onclick="deleteNote('${n.id}')" title="Delete">
-        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>`;
-  }).join('');
-}
-function addNote() {
-  const input = document.getElementById('noteInput');
-  const text = input.value.trim(); if (!text) return;
-  const projId = (noteTab === 'project' && activeProjectId) ? activeProjectId : null;
-  notes.push({id:uid(),text,projectId:projId,createdAt:new Date().toISOString()});
-  saveNotes(notes); input.value = '';
-  renderNotes(); renderGrid(); // refresh note counts
-}
-function deleteNote(id) {
-  notes = notes.filter(n=>n.id!==id);
-  saveNotes(notes); renderNotes(); renderGrid();
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// STATS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function openStats() {
-  const total = projects.length;
-  const byStatus = {active:0,paused:0,done:0,idea:0};
-  const byPriority = {critical:0,high:0,medium:0,low:0};
-  const avgProgress = total ? Math.round(projects.reduce((s,p)=>s+p.progress,0)/total) : 0;
-  const totalNotes = notes.length;
-  projects.forEach(p => { byStatus[p.status]=(byStatus[p.status]||0)+1; byPriority[p.priority]=(byPriority[p.priority]||0)+1; });
-
-  const statusColors = {active:'#22c55e',paused:'#f59e0b',done:'#6366f1',idea:'#8b5cf6'};
-  const priorityColors2 = {critical:'#ef4444',high:'#f97316',medium:'#eab308',low:'#22c55e'};
-  const maxS = Math.max(1,...Object.values(byStatus));
-  const maxP = Math.max(1,...Object.values(byPriority));
-
-  const techCounts = {};
-  projects.forEach(p=>(p.tech||[]).forEach(t=>{techCounts[t]=(techCounts[t]||0)+1;}));
-  const topTech = Object.entries(techCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const maxT = Math.max(1,...topTech.map(([,c])=>c));
-
-  document.getElementById('statsBody').innerHTML = `
-    <div class="stat-grid">
-      ${sTile(total,'Total Projects')}
-      ${sTile(byStatus.active,'Active')}
-      ${sTile(byStatus.done,'Completed')}
-      ${sTile(avgProgress+'%','Avg Progress')}
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="chart-wrap">
-        <div class="chart-title">By Status</div>
-        <div class="bar-chart">${Object.entries(byStatus).map(([k,v])=>`
-          <div class="bar-row">
-            <div class="bar-label">${k.charAt(0).toUpperCase()+k.slice(1)}</div>
-            <div class="bar-track"><div class="bar-fill" style="width:${v?Math.round(v/maxS*100):0}%;background:${statusColors[k]}">${v||''}</div></div>
-          </div>`).join('')}
-        </div>
-      </div>
-      <div class="chart-wrap">
-        <div class="chart-title">By Priority</div>
-        <div class="bar-chart">${Object.entries(byPriority).map(([k,v])=>`
-          <div class="bar-row">
-            <div class="bar-label">${k.charAt(0).toUpperCase()+k.slice(1)}</div>
-            <div class="bar-track"><div class="bar-fill" style="width:${v?Math.round(v/maxP*100):0}%;background:${priorityColors2[k]}">${v||''}</div></div>
-          </div>`).join('')}
-        </div>
-      </div>
-    </div>
-    ${topTech.length ? `<div class="chart-wrap" style="margin-top:12px">
-      <div class="chart-title">Top Tech Stack</div>
-      <div class="bar-chart">${topTech.map(([t,c])=>`
-        <div class="bar-row">
-          <div class="bar-label" style="font-size:11px">${esc(t)}</div>
-          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(c/maxT*100)}%;background:var(--accent)">${c}</div></div>
-        </div>`).join('')}
-      </div>
-    </div>` : ''}
-    <div style="margin-top:12px;font-size:12px;color:var(--fg-3);display:flex;gap:16px;flex-wrap:wrap">
-      <span>📝 ${totalNotes} note${totalNotes!==1?'s':''}</span>
-      <span>🎯 ${projects.filter(p=>p.milestones&&p.milestones.length).length} projects with milestones</span>
-      <span>🔗 ${projects.reduce((s,p)=>s+(p.resources||[]).length,0)} saved resources</span>
-    </div>`;
-  document.getElementById('statsModal').hidden = false;
-}
-function sTile(val, label) {
-  return `<div class="stat-card"><div class="stat-num">${val}</div><div class="stat-label">${label}</div></div>`;
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// IMPORT / EXPORT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function exportData() {
-  const data = JSON.stringify({projects,notes,exportedAt:new Date().toISOString()},null,2);
-  const blob = new Blob([data],{type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `project-hub-${new Date().toISOString().slice(0,10)}.json`;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast('Exported successfully');
-}
-function importData() {
-  document.getElementById('importFileInput').click();
-}
-document.getElementById('importFileInput').addEventListener('change', e => {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      if (data.projects && Array.isArray(data.projects)) {
-        projects = data.projects; saveProjects(projects);
-      }
-      if (data.notes && Array.isArray(data.notes)) {
-        notes = data.notes; saveNotes(notes);
-      }
-      renderTagFilters(); renderGrid(); renderNotes();
-      toast(`Imported ${projects.length} projects`);
-    } catch { toast('Import failed — invalid JSON'); }
-    e.target.value = '';
-  };
-  reader.readAsText(file);
-});
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// MODALS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function closeModal(id) {
-  document.getElementById(id).hidden = true;
-}
-document.querySelectorAll('.modal-backdrop').forEach(el => {
-  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    ['confirmModal','statsModal','detailModal','projectModal'].forEach(id => {
-      if (!document.getElementById(id).hidden) { closeModal(id); }
-    });
-  }
-});
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// THEME
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function applyTheme(t) {
-  document.documentElement.dataset.theme = t || '';
-  if (!t) delete document.documentElement.dataset.theme;
-  const icon = document.getElementById('themeIcon');
-  if (t === 'dark') {
-    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-  } else if (t === 'light') {
-    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-  } else {
-    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-  }
-}
-document.getElementById('themeToggleBtn').addEventListener('click', () => {
-  const themes = ['','dark','light'];
-  const cur = document.documentElement.dataset.theme || '';
-  const next = themes[(themes.indexOf(cur)+1)%themes.length];
-  prefs.theme = next; savePrefs(prefs);
-  applyTheme(next);
-});
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// SIDEBAR TOGGLES
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function toggleFilters() {
-  filterOpen = !filterOpen;
-  document.getElementById('filterSidebar').classList.toggle('collapsed', !filterOpen);
-  prefs.filterOpen = filterOpen; savePrefs(prefs);
-}
-function toggleNotes() {
-  notesOpen = !notesOpen;
-  document.getElementById('notesSidebar').classList.toggle('collapsed', !notesOpen);
-  prefs.notesOpen = notesOpen; savePrefs(prefs);
-  if (notesOpen) renderNotes();
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// TOAST
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let _toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// WIRE UP EVENTS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-document.getElementById('addProjectBtn').addEventListener('click', openAddModal);
-document.getElementById('saveProjectBtn').addEventListener('click', saveProject);
-document.getElementById('statsBtn').addEventListener('click', openStats);
-document.getElementById('exportBtn').addEventListener('click', exportData);
-document.getElementById('importBtn').addEventListener('click', importData);
-document.getElementById('filterToggleBtn').addEventListener('click', toggleFilters);
-document.getElementById('notesToggleBtn').addEventListener('click', toggleNotes);
-document.getElementById('notesCloseBtn').addEventListener('click', toggleNotes);
-document.getElementById('addNoteBtn').addEventListener('click', addNote);
-document.getElementById('noteInput').addEventListener('keydown', e => { if (e.key==='Enter' && e.ctrlKey) addNote(); });
-document.getElementById('searchInput').addEventListener('input', renderGrid);
-document.getElementById('sortSelect').addEventListener('change', e => { sortBy = e.target.value; prefs.sortBy = sortBy; savePrefs(prefs); renderGrid(); });
-document.getElementById('dateFrom').addEventListener('change', e => { filters.dateFrom = e.target.value; renderGrid(); });
-document.getElementById('dateTo').addEventListener('change', e => { filters.dateTo = e.target.value; renderGrid(); });
-document.getElementById('clearDateBtn').addEventListener('click', () => { filters.dateFrom=''; filters.dateTo=''; document.getElementById('dateFrom').value=''; document.getElementById('dateTo').value=''; renderGrid(); });
-
-document.querySelectorAll('[data-filter]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const type = btn.dataset.filter, val = btn.dataset.val;
-    filters[type] = val;
-    document.querySelectorAll(`[data-filter="${type}"]`).forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    renderGrid();
-  });
-});
-
-document.querySelectorAll('.note-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    noteTab = tab.dataset.tab;
-    document.querySelectorAll('.note-tab').forEach(t=>t.classList.toggle('active',t===tab));
-    renderNotes();
-  });
-});
-
-document.getElementById('gridViewBtn').addEventListener('click', () => {
-  viewMode='grid'; prefs.viewMode='grid'; savePrefs(prefs);
-  document.getElementById('projectGrid').classList.remove('list-view');
-  document.getElementById('gridViewBtn').classList.add('active');
-  document.getElementById('listViewBtn').classList.remove('active');
-});
-document.getElementById('listViewBtn').addEventListener('click', () => {
-  viewMode='list'; prefs.viewMode='list'; savePrefs(prefs);
-  document.getElementById('projectGrid').classList.add('list-view');
-  document.getElementById('listViewBtn').classList.add('active');
-  document.getElementById('gridViewBtn').classList.remove('active');
-});
-
-// Enter to save project modal
-document.getElementById('pName').addEventListener('keydown', e => { if (e.key==='Enter') saveProject(); });
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // INIT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-(function init() {
-  // Restore prefs
-  if (prefs.theme) applyTheme(prefs.theme);
-  if (prefs.sortBy) { sortBy = prefs.sortBy; document.getElementById('sortSelect').value = sortBy; }
-  if (prefs.viewMode === 'list') {
-    viewMode = 'list';
-    document.getElementById('projectGrid').classList.add('list-view');
-    document.getElementById('listViewBtn').classList.add('active');
-    document.getElementById('gridViewBtn').classList.remove('active');
-  }
-  if (!filterOpen) document.getElementById('filterSidebar').classList.add('collapsed');
-  if (!notesOpen)  document.getElementById('notesSidebar').classList.add('collapsed');
-
-  renderTagFilters();
-  renderGrid();
-  renderNotes();
-})();
+loadData();
+buildSidebar();
+render();
 </script>
+</body>
+</html>
