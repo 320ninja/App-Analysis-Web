@@ -1,0 +1,1527 @@
+<title>Project Hub</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+
+<style>
+/* ── Design tokens ─────────────────────────────────────────────────────────
+   Layout: three-panel — filter rail | main grid | collapsible notes pane
+   Type: Space Grotesk (headings) + Inter (body/data)
+   Palette: slate-tinted neutrals, indigo accent
+──────────────────────────────────────────────────────────────────────────── */
+:root {
+  --bg:          #f5f7fc;
+  --surface:     #ffffff;
+  --surface-2:   #eef0f7;
+  --surface-3:   #e4e7f2;
+  --border:      #dde1ef;
+  --border-2:    #c8cedf;
+  --fg:          #111827;
+  --fg-2:        #4b5675;
+  --fg-3:        #8792aa;
+  --accent:      #4f6ef7;
+  --accent-h:    #3d5be0;
+  --accent-soft: #eef1ff;
+  --accent-text: #3d5be0;
+  --danger:      #ef4444;
+  --warn:        #f59e0b;
+  --good:        #22c55e;
+  --info:        #6366f1;
+  --purple:      #8b5cf6;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:   0 4px 12px rgba(0,0,0,.09), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:   0 10px 30px rgba(0,0,0,.12), 0 4px 10px rgba(0,0,0,.07);
+  --radius-sm:   6px;
+  --radius:      10px;
+  --radius-lg:   16px;
+  --transition:  .18s cubic-bezier(.4,0,.2,1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:          #0d1117;
+    --surface:     #161c26;
+    --surface-2:   #1d2535;
+    --surface-3:   #242e42;
+    --border:      #252f42;
+    --border-2:    #2f3d55;
+    --fg:          #e6ecf5;
+    --fg-2:        #8a94ab;
+    --fg-3:        #56637a;
+    --accent:      #6b87f9;
+    --accent-h:    #849af9;
+    --accent-soft: #1a2347;
+    --accent-text: #8fa5ff;
+    --shadow-sm:   0 1px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.2);
+    --shadow-md:   0 4px 12px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.2);
+    --shadow-lg:   0 10px 30px rgba(0,0,0,.5), 0 4px 10px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:          #0d1117;
+  --surface:     #161c26;
+  --surface-2:   #1d2535;
+  --surface-3:   #242e42;
+  --border:      #252f42;
+  --border-2:    #2f3d55;
+  --fg:          #e6ecf5;
+  --fg-2:        #8a94ab;
+  --fg-3:        #56637a;
+  --accent:      #6b87f9;
+  --accent-h:    #849af9;
+  --accent-soft: #1a2347;
+  --accent-text: #8fa5ff;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.2);
+  --shadow-md:   0 4px 12px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.2);
+  --shadow-lg:   0 10px 30px rgba(0,0,0,.5), 0 4px 10px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-left: max(0px, env(safe-area-inset-left, 0px));
+  padding-right: max(0px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--fg-3); }
+
+/* ── Typography ─────────────────────────────────────────────── */
+h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; color: var(--fg); }
+h1 { font-size: 1.5rem; font-weight: 700; }
+h2 { font-size: 1.15rem; font-weight: 600; }
+h3 { font-size: 1rem; font-weight: 600; }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500; font-family: inherit;
+  border: 1px solid transparent; cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+  white-space: nowrap; line-height: 1;
+  text-decoration: none;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: var(--accent-h); border-color: var(--accent-h); }
+.btn-ghost { background: transparent; color: var(--fg-2); border-color: transparent; }
+.btn-ghost:hover { background: var(--surface-2); color: var(--fg); }
+.btn-outline { background: transparent; color: var(--fg-2); border-color: var(--border); }
+.btn-outline:hover { background: var(--surface-2); color: var(--fg); border-color: var(--border-2); }
+.btn-danger { background: #fef2f2; color: var(--danger); border-color: #fecaca; }
+.btn-danger:hover { background: #fee2e2; }
+:root[data-theme="dark"] .btn-danger,
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-danger { background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.3); } }
+.btn-icon { padding: 7px; border-radius: var(--radius-sm); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+/* ── Inputs ──────────────────────────────────────────────────── */
+input, select, textarea {
+  font-family: inherit; font-size: 13px;
+  background: var(--surface); color: var(--fg);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none; width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79,110,247,.14);
+}
+input::placeholder { color: var(--fg-3); }
+textarea { resize: vertical; min-height: 72px; }
+
+/* ── Badge/Pills ─────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 500; letter-spacing: .02em;
+  white-space: nowrap;
+}
+.badge-status-active  { background: rgba(34,197,94,.12);  color: #15803d; }
+.badge-status-paused  { background: rgba(245,158,11,.12); color: #b45309; }
+.badge-status-done    { background: rgba(99,102,241,.12); color: #4f46e5; }
+.badge-status-idea    { background: rgba(139,92,246,.12); color: #7c3aed; }
+:root[data-theme="dark"] .badge-status-active  { color: #4ade80; }
+:root[data-theme="dark"] .badge-status-paused  { color: #fbbf24; }
+:root[data-theme="dark"] .badge-status-done    { color: #818cf8; }
+:root[data-theme="dark"] .badge-status-idea    { color: #c084fc; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .badge-status-active  { color: #4ade80; }
+  :root:not([data-theme="light"]) .badge-status-paused  { color: #fbbf24; }
+  :root:not([data-theme="light"]) .badge-status-done    { color: #818cf8; }
+  :root:not([data-theme="light"]) .badge-status-idea    { color: #c084fc; }
+}
+
+.badge-priority-critical { background: rgba(239,68,68,.12);  color: #dc2626; }
+.badge-priority-high     { background: rgba(249,115,22,.12); color: #c2410c; }
+.badge-priority-medium   { background: rgba(234,179,8,.12);  color: #a16207; }
+.badge-priority-low      { background: rgba(34,197,94,.12);  color: #166534; }
+:root[data-theme="dark"] .badge-priority-critical { color: #f87171; }
+:root[data-theme="dark"] .badge-priority-high     { color: #fb923c; }
+:root[data-theme="dark"] .badge-priority-medium   { color: #fde047; }
+:root[data-theme="dark"] .badge-priority-low      { color: #4ade80; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .badge-priority-critical { color: #f87171; }
+  :root:not([data-theme="light"]) .badge-priority-high     { color: #fb923c; }
+  :root:not([data-theme="light"]) .badge-priority-medium   { color: #fde047; }
+  :root:not([data-theme="light"]) .badge-priority-low      { color: #4ade80; }
+}
+
+.tag {
+  display: inline-flex; align-items: center;
+  padding: 2px 7px; border-radius: var(--radius-sm);
+  font-size: 11px; font-weight: 500;
+  background: var(--surface-2); color: var(--fg-2);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+/* ── Progress bar ─────────────────────────────────────────────── */
+.progress-track {
+  height: 5px; background: var(--surface-3); border-radius: 999px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--accent); border-radius: 999px;
+  transition: width .4s ease;
+}
+.progress-fill.done { background: var(--good); }
+
+/* ── Priority stripe ─────────────────────────────────────────── */
+.priority-stripe { width: 3px; border-radius: 2px; flex-shrink: 0; }
+.stripe-critical { background: var(--danger); }
+.stripe-high     { background: #f97316; }
+.stripe-medium   { background: var(--warn); }
+.stripe-low      { background: var(--good); }
+
+/* ── Top bar ─────────────────────────────────────────────────── */
+#topbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50;
+  box-shadow: var(--shadow-sm);
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px); z-index: 100;
+  background: var(--surface);
+}
+.logo { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.logo-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 14px; font-family: 'Space Grotesk', sans-serif;
+}
+.logo-text { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; color: var(--fg); }
+.search-wrap {
+  flex: 1; max-width: 420px; position: relative;
+}
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--fg-3); pointer-events: none; }
+#searchInput { padding-left: 34px; }
+.topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+
+/* ── Main layout ─────────────────────────────────────────────── */
+#layout {
+  display: flex; flex: 1; overflow: hidden; min-height: 0;
+}
+
+/* ── Filter sidebar ───────────────────────────────────────────── */
+#filterSidebar {
+  width: 220px; flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; overflow-x: hidden;
+  padding: 16px 0;
+  display: flex; flex-direction: column; gap: 0;
+  transition: width var(--transition), opacity var(--transition);
+}
+#filterSidebar.collapsed { width: 0; opacity: 0; pointer-events: none; }
+.filter-section { padding: 0 14px 14px; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
+.filter-section:last-child { border-bottom: none; }
+.filter-label {
+  font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--fg-3); margin-bottom: 8px; display: block;
+}
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px; border-radius: var(--radius-sm);
+  font-size: 12.5px; cursor: pointer; color: var(--fg-2);
+  background: transparent; border: none; text-align: left;
+  transition: background var(--transition), color var(--transition);
+  font-family: inherit; width: 100%;
+}
+.filter-btn:hover { background: var(--surface-2); color: var(--fg); }
+.filter-btn.active { background: var(--accent-soft); color: var(--accent-text); font-weight: 500; }
+.filter-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.filter-count { margin-left: auto; font-size: 11px; color: var(--fg-3); }
+.filter-tech-list { display: flex; flex-wrap: wrap; gap: 4px; }
+.filter-tech-btn {
+  padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500;
+  background: var(--surface-2); color: var(--fg-2); border: 1px solid var(--border);
+  cursor: pointer; transition: all var(--transition);
+}
+.filter-tech-btn.active { background: var(--accent-soft); color: var(--accent-text); border-color: var(--accent); }
+
+/* ── Main content ─────────────────────────────────────────────── */
+#mainContent {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 20px max(16px, env(safe-area-inset-right, 0px));
+  padding-left: 20px;
+  min-width: 0;
+}
+
+/* Sort / view toolbar */
+#toolbar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.toolbar-left { display: flex; align-items: center; gap: 8px; }
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+#projectCount { font-size: 12px; color: var(--fg-3); }
+.sort-select { width: auto; padding: 6px 10px; font-size: 12.5px; }
+.view-btn { padding: 6px 8px; }
+.view-btn.active { background: var(--accent-soft); color: var(--accent-text); border-color: var(--accent); }
+
+/* ── Project grid ─────────────────────────────────────────────── */
+#projectGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+#projectGrid.list-view { grid-template-columns: 1fr; }
+
+/* Project card */
+.project-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow-sm);
+  cursor: pointer; overflow: hidden;
+  transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+  display: flex; flex-direction: column;
+}
+.project-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); border-color: var(--border-2); }
+.card-top { display: flex; gap: 10px; padding: 14px; padding-bottom: 10px; }
+.card-stripe { width: 3px; border-radius: 2px; flex-shrink: 0; }
+.card-main { flex: 1; min-width: 0; }
+.card-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14.5px; color: var(--fg); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-desc { font-size: 12px; color: var(--fg-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-meta { display: flex; align-items: center; gap: 6px; padding: 8px 14px; flex-wrap: wrap; }
+.card-tags { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 14px 10px; }
+.card-footer { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-top: 1px solid var(--border); background: var(--surface-2); }
+.card-date { font-size: 11px; color: var(--fg-3); margin-left: auto; }
+
+/* List view card */
+#projectGrid.list-view .project-card { flex-direction: row; align-items: stretch; }
+#projectGrid.list-view .card-top { flex: 1; min-width: 0; align-items: center; padding: 12px 14px; }
+#projectGrid.list-view .card-tags { padding: 12px 0; border: none; flex-wrap: nowrap; overflow: hidden; }
+#projectGrid.list-view .card-footer { border-top: none; border-left: 1px solid var(--border); background: transparent; padding: 12px 14px; flex-direction: column; align-items: flex-end; justify-content: center; min-width: 160px; }
+#projectGrid.list-view .card-desc { -webkit-line-clamp: 1; }
+#projectGrid.list-view .card-meta { padding: 0 0 0 13px; }
+
+/* Empty state */
+.empty-state {
+  grid-column: 1 / -1; padding: 60px 20px; text-align: center;
+  color: var(--fg-3);
+}
+.empty-state svg { margin-bottom: 12px; opacity: .4; }
+.empty-state h3 { color: var(--fg-2); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; margin-bottom: 16px; }
+
+/* ── Notes sidebar ────────────────────────────────────────────── */
+#notesSidebar {
+  width: 280px; flex-shrink: 0;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  transition: width var(--transition), opacity var(--transition);
+  overflow: hidden;
+}
+#notesSidebar.collapsed { width: 0; opacity: 0; pointer-events: none; }
+.notes-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0; background: var(--surface-2);
+}
+.notes-header h3 { flex: 1; font-size: 13px; }
+.notes-tabs {
+  display: flex; padding: 10px 14px 0; gap: 4px;
+  flex-shrink: 0; border-bottom: 1px solid var(--border);
+}
+.note-tab {
+  padding: 5px 10px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  font-size: 12px; font-weight: 500; cursor: pointer; color: var(--fg-3);
+  background: transparent; border: 1px solid transparent; border-bottom: none;
+  transition: all var(--transition);
+}
+.note-tab.active { background: var(--surface); color: var(--fg); border-color: var(--border); position: relative; bottom: -1px; }
+.notes-body { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.note-add-wrap { padding: 10px 12px; border-top: 1px solid var(--border); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; }
+.note-add-wrap textarea { font-size: 12px; min-height: 60px; }
+.note-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px; position: relative;
+}
+.note-card:hover .note-delete { opacity: 1; }
+.note-text { font-size: 12.5px; line-height: 1.5; color: var(--fg); white-space: pre-wrap; word-break: break-word; }
+.note-time { font-size: 10.5px; color: var(--fg-3); margin-top: 5px; }
+.note-project-tag { font-size: 10px; color: var(--accent-text); font-weight: 500; margin-bottom: 4px; }
+.note-delete {
+  position: absolute; top: 6px; right: 6px;
+  opacity: 0; background: transparent; border: none;
+  cursor: pointer; color: var(--fg-3); padding: 2px;
+  transition: color var(--transition), opacity var(--transition);
+}
+.note-delete:hover { color: var(--danger); }
+
+/* ── Modals ───────────────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  z-index: 200; display: flex; align-items: center; justify-content: center;
+  padding: max(16px, env(safe-area-inset-left, 0px));
+  animation: fadeIn .15s ease;
+}
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+.modal {
+  background: var(--surface); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg); width: 100%; max-width: 640px;
+  max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;
+  animation: slideUp .18s ease;
+}
+@keyframes slideUp { from { transform: translateY(16px); opacity: 0 } to { transform: none; opacity: 1 } }
+.modal-lg { max-width: 820px; }
+.modal-sm { max-width: 400px; }
+.modal-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 18px 22px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.modal-header h2 { flex: 1; font-size: 1.1rem; }
+.modal-body { overflow-y: auto; padding: 20px 22px; flex: 1; }
+.modal-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
+
+/* Form layout in modal */
+.form-row { margin-bottom: 14px; }
+.form-label { display: block; font-size: 12px; font-weight: 500; color: var(--fg-2); margin-bottom: 5px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-tags-input { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); min-height: 36px; align-items: center; cursor: text; }
+.form-tags-input:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,110,247,.14); }
+.form-tags-input input { border: none; padding: 2px 4px; background: transparent; min-width: 80px; flex: 1; box-shadow: none; }
+.form-tags-input .tag { cursor: pointer; }
+.form-tags-input .tag:hover { background: var(--surface-3); color: var(--danger); }
+
+/* Detail modal sections */
+.detail-section { margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.detail-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.detail-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--fg-3); margin-bottom: 10px; }
+.detail-desc { font-size: 13.5px; line-height: 1.65; color: var(--fg-2); }
+.milestone-list { display: flex; flex-direction: column; gap: 6px; }
+.milestone-item { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.milestone-item input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
+.milestone-item.done span { text-decoration: line-through; color: var(--fg-3); }
+.milestone-add { display: flex; gap: 6px; margin-top: 8px; }
+.milestone-add input { flex: 1; }
+.resource-list { display: flex; flex-direction: column; gap: 6px; }
+.resource-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--surface-2); border-radius: var(--radius-sm); font-size: 12.5px; }
+.resource-item a { color: var(--accent-text); text-decoration: none; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.resource-item a:hover { text-decoration: underline; }
+.history-list { display: flex; flex-direction: column; gap: 6px; }
+.history-item { display: flex; gap: 10px; font-size: 12px; color: var(--fg-2); }
+.history-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-2); flex-shrink: 0; margin-top: 4px; }
+.history-time { color: var(--fg-3); white-space: nowrap; }
+.tech-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tech-chip { padding: 3px 10px; background: var(--surface-2); color: var(--fg-2); border-radius: var(--radius-sm); font-size: 12px; border: 1px solid var(--border); font-weight: 500; }
+.link-item { display: flex; align-items: center; gap: 6px; }
+.link-item input { flex: 1; }
+
+/* ── Stats modal ─────────────────────────────────────────────── */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card {
+  background: var(--surface-2); border-radius: var(--radius); padding: 14px;
+  text-align: center; border: 1px solid var(--border);
+}
+.stat-num { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--fg); font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 11px; color: var(--fg-3); margin-top: 2px; text-transform: uppercase; letter-spacing: .06em; }
+.chart-wrap { background: var(--surface-2); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); margin-bottom: 12px; }
+.chart-title { font-size: 12px; font-weight: 600; color: var(--fg-2); margin-bottom: 12px; }
+.bar-chart { display: flex; flex-direction: column; gap: 8px; }
+.bar-row { display: flex; align-items: center; gap: 10px; }
+.bar-label { font-size: 12px; color: var(--fg-2); width: 70px; flex-shrink: 0; }
+.bar-track { flex: 1; height: 20px; background: var(--surface-3); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,.85); min-width: 24px; transition: width .4s ease; }
+
+/* ── Toast ───────────────────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: max(20px, env(safe-area-inset-bottom, 0px)); left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: var(--fg); color: var(--bg);
+  padding: 10px 18px; border-radius: 999px;
+  font-size: 13px; font-weight: 500; z-index: 400;
+  box-shadow: var(--shadow-lg);
+  transition: opacity .3s, transform .3s;
+  pointer-events: none; opacity: 0;
+}
+#toast.show { opacity: 1; }
+
+/* ── Confirm dialog ───────────────────────────────────────────── */
+.confirm-msg { font-size: 14px; color: var(--fg-2); margin-bottom: 4px; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  #filterSidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 100; width: 240px; padding-top: 60px; }
+  #filterSidebar.collapsed { width: 0; }
+  #notesSidebar { position: fixed; right: 0; top: 0; bottom: 0; z-index: 100; width: 85vw; max-width: 300px; }
+  #notesSidebar.collapsed { width: 0; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+  .modal { max-height: 95vh; }
+}
+</style>
+
+<!-- ───────────────────────── TOPBAR ───────────────────────────── -->
+<div id="topbar">
+  <div class="logo">
+    <div class="logo-icon">P</div>
+    <span class="logo-text">Project Hub</span>
+  </div>
+  <div class="search-wrap">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input id="searchInput" type="search" placeholder="Search projects…" autocomplete="off">
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-ghost btn-icon" id="filterToggleBtn" title="Toggle filters">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M6 12h12M9 18h6"/></svg>
+    </button>
+    <button class="btn btn-ghost btn-icon" id="statsBtn" title="Stats">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    </button>
+    <button class="btn btn-outline btn-sm" id="importBtn">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Import
+    </button>
+    <button class="btn btn-outline btn-sm" id="exportBtn">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Export
+    </button>
+    <button class="btn btn-primary btn-sm" id="addProjectBtn">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Project
+    </button>
+    <button class="btn btn-ghost btn-icon" id="notesToggleBtn" title="Toggle notes">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    </button>
+    <button class="btn btn-ghost btn-icon" id="themeToggleBtn" title="Toggle theme">
+      <svg id="themeIcon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ───────────────────────── LAYOUT ───────────────────────────── -->
+<div id="layout">
+
+  <!-- FILTER SIDEBAR -->
+  <aside id="filterSidebar">
+    <div class="filter-section">
+      <span class="filter-label">Status</span>
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="status" data-val="all">
+          <span class="filter-dot" style="background:var(--fg-3)"></span> All
+          <span class="filter-count" id="countAll">0</span>
+        </button>
+        <button class="filter-btn" data-filter="status" data-val="active">
+          <span class="filter-dot" style="background:#22c55e"></span> Active
+          <span class="filter-count" id="countActive">0</span>
+        </button>
+        <button class="filter-btn" data-filter="status" data-val="paused">
+          <span class="filter-dot" style="background:#f59e0b"></span> Paused
+          <span class="filter-count" id="countPaused">0</span>
+        </button>
+        <button class="filter-btn" data-filter="status" data-val="done">
+          <span class="filter-dot" style="background:#6366f1"></span> Done
+          <span class="filter-count" id="countDone">0</span>
+        </button>
+        <button class="filter-btn" data-filter="status" data-val="idea">
+          <span class="filter-dot" style="background:#8b5cf6"></span> Idea
+          <span class="filter-count" id="countIdea">0</span>
+        </button>
+      </div>
+    </div>
+    <div class="filter-section">
+      <span class="filter-label">Priority</span>
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="priority" data-val="all">All priorities</button>
+        <button class="filter-btn" data-filter="priority" data-val="critical">🔴 Critical</button>
+        <button class="filter-btn" data-filter="priority" data-val="high">🟠 High</button>
+        <button class="filter-btn" data-filter="priority" data-val="medium">🟡 Medium</button>
+        <button class="filter-btn" data-filter="priority" data-val="low">🟢 Low</button>
+      </div>
+    </div>
+    <div class="filter-section">
+      <span class="filter-label">Tags</span>
+      <div class="filter-tech-list" id="tagFilterList"></div>
+    </div>
+    <div class="filter-section">
+      <span class="filter-label">Tech Stack</span>
+      <div class="filter-tech-list" id="techFilterList"></div>
+    </div>
+    <div class="filter-section">
+      <span class="filter-label">Date Range</span>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div>
+          <div class="filter-label" style="font-size:10px;margin-bottom:3px">From</div>
+          <input type="date" id="dateFrom" style="font-size:11px;padding:5px 7px">
+        </div>
+        <div>
+          <div class="filter-label" style="font-size:10px;margin-bottom:3px">To</div>
+          <input type="date" id="dateTo" style="font-size:11px;padding:5px 7px">
+        </div>
+        <button class="btn btn-ghost btn-sm" id="clearDateBtn" style="font-size:11px;padding:4px 8px;justify-content:center">Clear dates</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main id="mainContent">
+    <div id="toolbar">
+      <div class="toolbar-left">
+        <span id="projectCount">0 projects</span>
+      </div>
+      <div class="toolbar-right">
+        <select class="sort-select btn-outline" id="sortSelect" style="border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--fg)">
+          <option value="updated">Last updated</option>
+          <option value="created">Date created</option>
+          <option value="name">Name A–Z</option>
+          <option value="priority">Priority</option>
+          <option value="progress">Progress</option>
+        </select>
+        <button class="btn btn-outline btn-icon view-btn active" id="gridViewBtn" title="Grid view">
+          <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+        </button>
+        <button class="btn btn-outline btn-icon view-btn" id="listViewBtn" title="List view">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="projectGrid"></div>
+  </main>
+
+  <!-- NOTES SIDEBAR -->
+  <aside id="notesSidebar">
+    <div class="notes-header">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <h3>Notes</h3>
+      <button class="btn btn-ghost btn-icon" id="notesCloseBtn">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="notes-tabs">
+      <button class="note-tab active" data-tab="global">Global</button>
+      <button class="note-tab" data-tab="project">Project</button>
+    </div>
+    <div class="notes-body" id="notesBody"></div>
+    <div class="note-add-wrap">
+      <textarea id="noteInput" placeholder="Add a note…" rows="3"></textarea>
+      <button class="btn btn-primary btn-sm" id="addNoteBtn" style="align-self:flex-end">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Note
+      </button>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ─────────────────────── ADD / EDIT PROJECT MODAL ─────────── -->
+<div id="projectModal" class="modal-backdrop" hidden>
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 id="projectModalTitle">New Project</h2>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('projectModal')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editingId">
+      <div class="form-grid">
+        <div class="form-row" style="grid-column:1/-1">
+          <label class="form-label">Project Name *</label>
+          <input id="pName" type="text" placeholder="e.g. Personal Portfolio v2">
+        </div>
+        <div class="form-row" style="grid-column:1/-1">
+          <label class="form-label">Description</label>
+          <textarea id="pDesc" placeholder="What is this project about?"></textarea>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Status</label>
+          <select id="pStatus">
+            <option value="idea">Idea</option>
+            <option value="active" selected>Active</option>
+            <option value="paused">Paused</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Priority</label>
+          <select id="pPriority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Start Date</label>
+          <input id="pStartDate" type="date">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Target Date</label>
+          <input id="pTargetDate" type="date">
+        </div>
+        <div class="form-row" style="grid-column:1/-1">
+          <label class="form-label">Goals</label>
+          <textarea id="pGoals" placeholder="What do you want to achieve?" style="min-height:60px"></textarea>
+        </div>
+        <div class="form-row" style="grid-column:1/-1">
+          <label class="form-label">Tech Stack (comma-separated)</label>
+          <input id="pTech" type="text" placeholder="e.g. React, Node.js, PostgreSQL">
+        </div>
+        <div class="form-row" style="grid-column:1/-1">
+          <label class="form-label">Tags (comma-separated)</label>
+          <input id="pTags" type="text" placeholder="e.g. frontend, side-project, learning">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Progress (%)</label>
+          <input id="pProgress" type="number" min="0" max="100" value="0">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Repo / Main URL</label>
+          <input id="pUrl" type="url" placeholder="https://github.com/…">
+        </div>
+        <div class="form-row" style="grid-column:1/-1">
+          <label class="form-label">Live URL</label>
+          <input id="pLive" type="url" placeholder="https://…">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('projectModal')">Cancel</button>
+      <button class="btn btn-primary" id="saveProjectBtn">Save Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────── PROJECT DETAIL MODAL ─────────────── -->
+<div id="detailModal" class="modal-backdrop" hidden>
+  <div class="modal modal-lg">
+    <div class="modal-header" id="detailHeader">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <h2 id="detailTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></h2>
+          <span id="detailStatusBadge" class="badge"></span>
+          <span id="detailPriorityBadge" class="badge"></span>
+        </div>
+        <div id="detailTechChips" class="tech-chips"></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn btn-outline btn-sm" id="detailEditBtn">Edit</button>
+        <button class="btn btn-ghost btn-icon" onclick="closeModal('detailModal')">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" id="detailBody">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────── STATS MODAL ──────────────────────── -->
+<div id="statsModal" class="modal-backdrop" hidden>
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2>Project Stats</h2>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('statsModal')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="statsBody"></div>
+  </div>
+</div>
+
+<!-- ─────────────────────── CONFIRM MODAL ────────────────────── -->
+<div id="confirmModal" class="modal-backdrop" hidden>
+  <div class="modal modal-sm">
+    <div class="modal-header"><h2 id="confirmTitle">Confirm</h2></div>
+    <div class="modal-body"><p class="confirm-msg" id="confirmMsg"></p></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('confirmModal')">Cancel</button>
+      <button class="btn btn-danger" id="confirmOkBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────── IMPORT INPUT ─────────────────────── -->
+<input type="file" id="importFileInput" accept=".json" hidden>
+
+<div id="toast"></div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// DATA
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const STORAGE_KEY = 'projecthub_v2';
+const NOTES_KEY   = 'projecthub_notes';
+const PREFS_KEY   = 'projecthub_prefs';
+
+function loadProjects() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+}
+function saveProjects(p) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch {}
+}
+function loadNotes() {
+  try { return JSON.parse(localStorage.getItem(NOTES_KEY) || '[]'); } catch { return []; }
+}
+function saveNotes(n) {
+  try { localStorage.setItem(NOTES_KEY, JSON.stringify(n)); } catch {}
+}
+function loadPrefs() {
+  try { return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { return {}; }
+}
+function savePrefs(p) {
+  try { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch {}
+}
+
+let projects = loadProjects();
+let notes    = loadNotes();
+let prefs    = loadPrefs();
+
+// Seed sample data if empty
+if (projects.length === 0) {
+  const now = Date.now();
+  projects = [
+    { id: uid(), name: 'Portfolio Website v3', description: 'Complete redesign of personal portfolio with new case studies, blog, and project showcase.', status: 'active', priority: 'high', progress: 65, tech: ['Next.js','Tailwind CSS','Framer Motion'], tags: ['frontend','personal','design'], goals: 'Ship by Q1. Add 5 case studies, improve performance score to 95+.', startDate: '2026-09-01', targetDate: '2026-12-31', url: 'https://github.com/example/portfolio', live: 'https://example.dev', milestones: [{id:uid(),text:'Wireframes complete',done:true},{id:uid(),text:'Dev environment set up',done:true},{id:uid(),text:'Home page done',done:false},{id:uid(),text:'Case studies written',done:false}], resources: [{id:uid(),label:'Design file',url:'https://figma.com'},{id:uid(),label:'Reference site',url:'https://brittanychiang.com'}], history: [{date:new Date(now-7*864e5).toISOString(),note:'Status changed to active'},{date:new Date(now-2*864e5).toISOString(),note:'Progress updated to 65%'}], createdAt: new Date(now-30*864e5).toISOString(), updatedAt: new Date(now-864e5).toISOString() },
+    { id: uid(), name: 'CLI Task Manager', description: 'Rust-based command-line tool for managing tasks with SQLite persistence and sync.', status: 'active', priority: 'medium', progress: 30, tech: ['Rust','SQLite','Clap'], tags: ['cli','tool','learning'], goals: 'Learn Rust patterns. Ship v1.0 to crates.io.', startDate: '2026-10-15', targetDate: '2027-02-28', url: 'https://github.com/example/task-cli', live: '', milestones: [{id:uid(),text:'Core data model',done:true},{id:uid(),text:'Add/complete commands',done:false},{id:uid(),text:'Sync feature',done:false}], resources: [], history: [{date:new Date(now-10*864e5).toISOString(),note:'Project created'}], createdAt: new Date(now-10*864e5).toISOString(), updatedAt: new Date(now-3*864e5).toISOString() },
+    { id: uid(), name: 'AI Recipe Generator', description: 'Web app that generates personalized recipes based on ingredients in your fridge using Claude API.', status: 'idea', priority: 'low', progress: 0, tech: ['Python','FastAPI','React','Claude API'], tags: ['ai','side-project','food'], goals: 'Validate idea. Build MVP in a weekend.', startDate: '', targetDate: '', url: '', live: '', milestones: [], resources: [{id:uid(),label:'Claude API docs',url:'https://docs.anthropic.com'}], history: [{date:new Date(now-5*864e5).toISOString(),note:'Idea noted'}], createdAt: new Date(now-5*864e5).toISOString(), updatedAt: new Date(now-5*864e5).toISOString() },
+    { id: uid(), name: 'Open Source UI Kit', description: 'Accessible React component library with dark mode, TypeScript, and comprehensive Storybook docs.', status: 'paused', priority: 'medium', progress: 45, tech: ['React','TypeScript','Storybook','Radix UI'], tags: ['open-source','library','design-system'], goals: 'Reach 20 components. Publish to npm.', startDate: '2026-07-01', targetDate: '2027-03-31', url: 'https://github.com/example/ui-kit', live: '', milestones: [{id:uid(),text:'Button, Input, Select',done:true},{id:uid(),text:'Modal, Drawer, Toast',done:true},{id:uid(),text:'Data table',done:false},{id:uid(),text:'Form validation helpers',done:false}], resources: [], history: [{date:new Date(now-60*864e5).toISOString(),note:'Project started'},{date:new Date(now-14*864e5).toISOString(),note:'Status changed to paused — focusing on portfolio'}], createdAt: new Date(now-60*864e5).toISOString(), updatedAt: new Date(now-14*864e5).toISOString() },
+    { id: uid(), name: 'Workout Tracker App', description: 'React Native app for logging workouts, tracking PRs, and visualizing progress over time.', status: 'done', priority: 'low', progress: 100, tech: ['React Native','Expo','SQLite','Victory Native'], tags: ['mobile','health','personal'], goals: 'Use daily. Track 6 months of data.', startDate: '2026-01-01', targetDate: '2026-06-30', url: 'https://github.com/example/workout', live: '', milestones: [{id:uid(),text:'Core logging',done:true},{id:uid(),text:'Progress charts',done:true},{id:uid(),text:'Streak tracking',done:true}], resources: [], history: [{date:new Date(now-120*864e5).toISOString(),note:'Project started'},{date:new Date(now-60*864e5).toISOString(),note:'v1.0 shipped'},{date:new Date(now-30*864e5).toISOString(),note:'Status set to done'}], createdAt: new Date(now-150*864e5).toISOString(), updatedAt: new Date(now-30*864e5).toISOString() }
+  ];
+  saveProjects(projects);
+  notes = [
+    { id: uid(), text: 'Focus this month: portfolio + CLI tool. Keep scope tight.', projectId: null, createdAt: new Date(now-864e5).toISOString() },
+    { id: uid(), text: 'Look into Incremental Static Regeneration for the portfolio blog section.', projectId: projects[0].id, createdAt: new Date(now-2*864e5).toISOString() }
+  ];
+  saveNotes(notes);
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// STATE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let filters = { status: 'all', priority: 'all', tags: [], tech: [], dateFrom: '', dateTo: '' };
+let sortBy = prefs.sortBy || 'updated';
+let viewMode = prefs.viewMode || 'grid';
+let noteTab = 'global';
+let activeProjectId = null; // for project notes tab
+let filterOpen = prefs.filterOpen !== false;
+let notesOpen  = prefs.notesOpen !== false;
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// FILTER + SORT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  return projects
+    .filter(p => {
+      if (filters.status !== 'all' && p.status !== filters.status) return false;
+      if (filters.priority !== 'all' && p.priority !== filters.priority) return false;
+      if (filters.tags.length && !filters.tags.every(t => p.tags && p.tags.includes(t))) return false;
+      if (filters.tech.length && !filters.tech.every(t => p.tech && p.tech.includes(t))) return false;
+      if (filters.dateFrom && p.startDate && p.startDate < filters.dateFrom) return false;
+      if (filters.dateTo   && p.startDate && p.startDate > filters.dateTo)   return false;
+      if (q) {
+        const hay = [p.name, p.description, ...(p.tags||[]), ...(p.tech||[])].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'name')     return a.name.localeCompare(b.name);
+      if (sortBy === 'created')  return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortBy === 'progress') return b.progress - a.progress;
+      if (sortBy === 'priority') {
+        const ord = {critical:0,high:1,medium:2,low:3};
+        return (ord[a.priority]||3) - (ord[b.priority]||3);
+      }
+      return new Date(b.updatedAt) - new Date(a.updatedAt);
+    });
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// RENDER CARDS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const statusDot = { active: '#22c55e', paused: '#f59e0b', done: '#6366f1', idea: '#8b5cf6' };
+const priorityColor = { critical: '#ef4444', high: '#f97316', medium: '#eab308', low: '#22c55e' };
+const priorityLabel = { critical: '🔴 Critical', high: '🟠 High', medium: '🟡 Medium', low: '🟢 Low' };
+
+function renderGrid() {
+  const grid = document.getElementById('projectGrid');
+  const filtered = getFiltered();
+  document.getElementById('projectCount').textContent = `${filtered.length} project${filtered.length !== 1 ? 's' : ''}`;
+  updateFilterCounts();
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state">
+      <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/></svg>
+      <h3>No projects found</h3>
+      <p>Try adjusting your filters or search.</p>
+      <button class="btn btn-primary" onclick="openAddModal()">New Project</button>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => cardHTML(p)).join('');
+}
+
+function cardHTML(p) {
+  const tags = (p.tags||[]).slice(0,3).map(t => `<span class="tag">${esc(t)}</span>`).join('');
+  const techChips = (p.tech||[]).slice(0,3).map(t => `<span class="tag">${esc(t)}</span>`).join('');
+  const isFull = p.progress === 100;
+  const noteCount = notes.filter(n => n.projectId === p.id).length;
+  return `<div class="project-card" data-id="${p.id}" onclick="openDetail('${p.id}')">
+    <div class="card-top">
+      <div class="card-stripe ${stripeClass(p.priority)}"></div>
+      <div class="card-main">
+        <div class="card-title">${esc(p.name)}</div>
+        ${p.description ? `<div class="card-desc">${esc(p.description)}</div>` : ''}
+      </div>
+    </div>
+    <div class="card-meta">
+      <span class="badge badge-status-${p.status}">${p.status.charAt(0).toUpperCase()+p.status.slice(1)}</span>
+      <span class="badge badge-priority-${p.priority}">${priorityLabel[p.priority]||p.priority}</span>
+      ${noteCount > 0 ? `<span style="font-size:11px;color:var(--fg-3);margin-left:auto">📝 ${noteCount}</span>` : ''}
+    </div>
+    ${tags ? `<div class="card-tags">${tags}</div>` : ''}
+    <div class="card-footer">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--fg-3);margin-bottom:4px">
+          <span>${techChips}</span>
+          <span style="font-variant-numeric:tabular-nums">${p.progress}%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill ${isFull?'done':''}" style="width:${p.progress}%"></div>
+        </div>
+      </div>
+      <span class="card-date">${formatDate(p.updatedAt)}</span>
+    </div>
+  </div>`;
+}
+
+function stripeClass(pr) {
+  return {critical:'stripe-critical',high:'stripe-high',medium:'stripe-medium',low:'stripe-low'}[pr]||'stripe-low';
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso), now = new Date();
+  const diff = now - d;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  if (diff < 7*86400000) return Math.floor(diff/86400000) + 'd ago';
+  return d.toLocaleDateString(undefined, {month:'short',day:'numeric',year:d.getFullYear()!==now.getFullYear()?'numeric':undefined});
+}
+
+function updateFilterCounts() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const count = s => projects.filter(p => {
+    if (s !== 'all' && p.status !== s) return false;
+    if (q) {
+      const hay = [p.name,p.description,...(p.tags||[]),...(p.tech||[])].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  }).length;
+  document.getElementById('countAll').textContent    = projects.length;
+  document.getElementById('countActive').textContent = count('active');
+  document.getElementById('countPaused').textContent = count('paused');
+  document.getElementById('countDone').textContent   = count('done');
+  document.getElementById('countIdea').textContent   = count('idea');
+}
+
+function renderTagFilters() {
+  const allTags  = [...new Set(projects.flatMap(p => p.tags||[]))].sort();
+  const allTechs = [...new Set(projects.flatMap(p => p.tech||[]))].sort();
+  document.getElementById('tagFilterList').innerHTML  = allTags.map(t => `<button class="filter-tech-btn ${filters.tags.includes(t)?'active':''}" onclick="toggleTagFilter('${esc(t)}')">${esc(t)}</button>`).join('');
+  document.getElementById('techFilterList').innerHTML = allTechs.map(t => `<button class="filter-tech-btn ${filters.tech.includes(t)?'active':''}" onclick="toggleTechFilter('${esc(t)}')">${esc(t)}</button>`).join('');
+}
+
+function toggleTagFilter(t) {
+  if (filters.tags.includes(t)) filters.tags = filters.tags.filter(x=>x!==t);
+  else filters.tags.push(t);
+  renderTagFilters(); renderGrid();
+}
+function toggleTechFilter(t) {
+  if (filters.tech.includes(t)) filters.tech = filters.tech.filter(x=>x!==t);
+  else filters.tech.push(t);
+  renderTagFilters(); renderGrid();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// DETAIL MODAL
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function openDetail(id) {
+  const p = projects.find(x => x.id === id);
+  if (!p) return;
+  activeProjectId = id;
+
+  document.getElementById('detailTitle').textContent = p.name;
+  document.getElementById('detailStatusBadge').className = `badge badge-status-${p.status}`;
+  document.getElementById('detailStatusBadge').textContent = p.status.charAt(0).toUpperCase()+p.status.slice(1);
+  document.getElementById('detailPriorityBadge').className = `badge badge-priority-${p.priority}`;
+  document.getElementById('detailPriorityBadge').textContent = priorityLabel[p.priority]||p.priority;
+  document.getElementById('detailTechChips').innerHTML = (p.tech||[]).map(t=>`<span class="tech-chip">${esc(t)}</span>`).join('');
+  document.getElementById('detailEditBtn').onclick = () => { closeModal('detailModal'); openEditModal(id); };
+
+  const milestonesDone = (p.milestones||[]).filter(m=>m.done).length;
+  const milestonesTotal = (p.milestones||[]).length;
+
+  document.getElementById('detailBody').innerHTML = `
+    <div class="detail-section">
+      <h3>Overview</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:12px">
+        ${infoTile('Progress', p.progress+'%')}
+        ${infoTile('Milestones', milestonesTotal ? `${milestonesDone}/${milestonesTotal}` : '—')}
+        ${infoTile('Start', p.startDate || '—')}
+        ${infoTile('Target', p.targetDate || '—')}
+      </div>
+      <div class="progress-track" style="height:8px"><div class="progress-fill ${p.progress===100?'done':''}" style="width:${p.progress}%"></div></div>
+    </div>
+    ${p.description ? `<div class="detail-section"><h3>Description</h3><p class="detail-desc">${esc(p.description)}</p></div>` : ''}
+    ${p.goals ? `<div class="detail-section"><h3>Goals</h3><p class="detail-desc">${esc(p.goals)}</p></div>` : ''}
+    <div class="detail-section">
+      <h3>Milestones</h3>
+      <div class="milestone-list" id="milestoneList">${renderMilestones(p)}</div>
+      <div class="milestone-add">
+        <input id="newMilestone" type="text" placeholder="Add milestone…">
+        <button class="btn btn-outline btn-sm" onclick="addMilestone('${id}')">Add</button>
+      </div>
+    </div>
+    ${(p.tags||[]).length ? `<div class="detail-section"><h3>Tags</h3><div style="display:flex;flex-wrap:wrap;gap:6px">${(p.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div></div>` : ''}
+    <div class="detail-section">
+      <h3>Resources & Links</h3>
+      <div class="resource-list" id="resourceList">${renderResources(p)}</div>
+      <div class="milestone-add" style="gap:4px">
+        <input id="newResLabel" type="text" placeholder="Label" style="flex:.5">
+        <input id="newResUrl"   type="url"  placeholder="URL">
+        <button class="btn btn-outline btn-sm" onclick="addResource('${id}')">Add</button>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h3>Status History</h3>
+      <div class="history-list">${renderHistory(p)}</div>
+    </div>
+    <div class="detail-section" style="border:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <h3 style="margin:0">Quick Note</h3>
+        <button class="btn btn-ghost btn-sm" onclick="openProjectNotes('${id}')">View all notes →</button>
+      </div>
+      <div style="display:flex;gap:6px">
+        <input id="quickNoteInput" type="text" placeholder="Add a quick note for this project…">
+        <button class="btn btn-outline btn-sm" onclick="addQuickNote('${id}')">Add</button>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:4px">
+      <button class="btn btn-danger btn-sm" onclick="deleteProject('${id}')">Delete project</button>
+    </div>
+  `;
+
+  document.getElementById('detailModal').hidden = false;
+}
+
+function infoTile(label, val) {
+  return `<div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:10px 12px;border:1px solid var(--border)">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-3);margin-bottom:3px">${label}</div>
+    <div style="font-weight:600;font-size:14px;color:var(--fg);font-variant-numeric:tabular-nums">${val}</div>
+  </div>`;
+}
+
+function renderMilestones(p) {
+  return (p.milestones||[]).map(m => `
+    <div class="milestone-item ${m.done?'done':''}">
+      <input type="checkbox" ${m.done?'checked':''} onchange="toggleMilestone('${p.id}','${m.id}',this.checked)">
+      <span>${esc(m.text)}</span>
+      <button onclick="deleteMilestone('${p.id}','${m.id}')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--fg-3);font-size:12px;padding:2px 4px" title="Remove">✕</button>
+    </div>`).join('');
+}
+function renderResources(p) {
+  return (p.resources||[]).map(r => `
+    <div class="resource-item">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      <a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.label||r.url)}</a>
+      <button onclick="deleteResource('${p.id}','${r.id}')" style="background:none;border:none;cursor:pointer;color:var(--fg-3);font-size:12px;padding:2px 4px;margin-left:auto">✕</button>
+    </div>`).join('');
+}
+function renderHistory(p) {
+  return (p.history||[]).slice().reverse().map(h => `
+    <div class="history-item">
+      <div class="history-dot"></div>
+      <span class="history-time">${formatDate(h.date)}</span>
+      <span>${esc(h.note)}</span>
+    </div>`).join('') || '<p style="font-size:12px;color:var(--fg-3)">No history yet.</p>';
+}
+
+// Milestone CRUD
+function toggleMilestone(projId, mId, done) {
+  const p = projects.find(x=>x.id===projId); if (!p) return;
+  const m = (p.milestones||[]).find(x=>x.id===mId); if (!m) return;
+  m.done = done;
+  p.updatedAt = new Date().toISOString();
+  saveProjects(projects); renderGrid();
+  document.getElementById('milestoneList').innerHTML = renderMilestones(p);
+}
+function addMilestone(projId) {
+  const input = document.getElementById('newMilestone');
+  const text = input.value.trim(); if (!text) return;
+  const p = projects.find(x=>x.id===projId); if (!p) return;
+  if (!p.milestones) p.milestones = [];
+  p.milestones.push({id:uid(),text,done:false});
+  p.updatedAt = new Date().toISOString();
+  saveProjects(projects); input.value = '';
+  document.getElementById('milestoneList').innerHTML = renderMilestones(p);
+  renderGrid();
+}
+function deleteMilestone(projId, mId) {
+  const p = projects.find(x=>x.id===projId); if (!p) return;
+  p.milestones = (p.milestones||[]).filter(m=>m.id!==mId);
+  p.updatedAt = new Date().toISOString();
+  saveProjects(projects);
+  document.getElementById('milestoneList').innerHTML = renderMilestones(p);
+  renderGrid();
+}
+function addResource(projId) {
+  const lbl = document.getElementById('newResLabel').value.trim();
+  const url = document.getElementById('newResUrl').value.trim();
+  if (!url) return;
+  const p = projects.find(x=>x.id===projId); if (!p) return;
+  if (!p.resources) p.resources = [];
+  p.resources.push({id:uid(),label:lbl||url,url});
+  p.updatedAt = new Date().toISOString();
+  saveProjects(projects);
+  document.getElementById('newResLabel').value = '';
+  document.getElementById('newResUrl').value = '';
+  document.getElementById('resourceList').innerHTML = renderResources(p);
+}
+function deleteResource(projId, rId) {
+  const p = projects.find(x=>x.id===projId); if (!p) return;
+  p.resources = (p.resources||[]).filter(r=>r.id!==rId);
+  p.updatedAt = new Date().toISOString();
+  saveProjects(projects);
+  document.getElementById('resourceList').innerHTML = renderResources(p);
+}
+function addQuickNote(projId) {
+  const input = document.getElementById('quickNoteInput');
+  const text = input.value.trim(); if (!text) return;
+  notes.push({id:uid(),text,projectId:projId,createdAt:new Date().toISOString()});
+  saveNotes(notes); input.value = '';
+  toast('Note added');
+}
+function openProjectNotes(id) {
+  closeModal('detailModal');
+  noteTab = 'project'; activeProjectId = id;
+  document.querySelectorAll('.note-tab').forEach(t => t.classList.toggle('active', t.dataset.tab==='project'));
+  if (notesOpen) renderNotes();
+  else { toggleNotes(); }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ADD / EDIT MODAL
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function openAddModal() {
+  document.getElementById('projectModalTitle').textContent = 'New Project';
+  document.getElementById('editingId').value = '';
+  clearProjectForm();
+  document.getElementById('projectModal').hidden = false;
+}
+function openEditModal(id) {
+  const p = projects.find(x=>x.id===id); if (!p) return;
+  document.getElementById('projectModalTitle').textContent = 'Edit Project';
+  document.getElementById('editingId').value = id;
+  document.getElementById('pName').value        = p.name||'';
+  document.getElementById('pDesc').value        = p.description||'';
+  document.getElementById('pStatus').value      = p.status||'active';
+  document.getElementById('pPriority').value    = p.priority||'medium';
+  document.getElementById('pStartDate').value   = p.startDate||'';
+  document.getElementById('pTargetDate').value  = p.targetDate||'';
+  document.getElementById('pGoals').value       = p.goals||'';
+  document.getElementById('pTech').value        = (p.tech||[]).join(', ');
+  document.getElementById('pTags').value        = (p.tags||[]).join(', ');
+  document.getElementById('pProgress').value    = p.progress||0;
+  document.getElementById('pUrl').value         = p.url||'';
+  document.getElementById('pLive').value        = p.live||'';
+  document.getElementById('projectModal').hidden = false;
+}
+function clearProjectForm() {
+  ['pName','pDesc','pGoals','pTech','pTags','pUrl','pLive'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pStatus').value   = 'active';
+  document.getElementById('pPriority').value = 'medium';
+  document.getElementById('pProgress').value = 0;
+  document.getElementById('pStartDate').value = '';
+  document.getElementById('pTargetDate').value = '';
+}
+function saveProject() {
+  const name = document.getElementById('pName').value.trim();
+  if (!name) { alert('Project name is required'); return; }
+  const id = document.getElementById('editingId').value;
+  const oldStatus = id ? (projects.find(x=>x.id===id)||{}).status : null;
+  const newStatus = document.getElementById('pStatus').value;
+  const tech = document.getElementById('pTech').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const tags = document.getElementById('pTags').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const now = new Date().toISOString();
+
+  if (id) {
+    const p = projects.find(x=>x.id===id);
+    Object.assign(p, { name, description: document.getElementById('pDesc').value.trim(), status: newStatus, priority: document.getElementById('pPriority').value, goals: document.getElementById('pGoals').value.trim(), tech, tags, progress: parseInt(document.getElementById('pProgress').value)||0, startDate: document.getElementById('pStartDate').value, targetDate: document.getElementById('pTargetDate').value, url: document.getElementById('pUrl').value.trim(), live: document.getElementById('pLive').value.trim(), updatedAt: now });
+    if (oldStatus && oldStatus !== newStatus) {
+      if (!p.history) p.history = [];
+      p.history.push({date:now,note:`Status changed from ${oldStatus} → ${newStatus}`});
+    }
+  } else {
+    const p = { id: uid(), name, description: document.getElementById('pDesc').value.trim(), status: newStatus, priority: document.getElementById('pPriority').value, goals: document.getElementById('pGoals').value.trim(), tech, tags, progress: parseInt(document.getElementById('pProgress').value)||0, startDate: document.getElementById('pStartDate').value, targetDate: document.getElementById('pTargetDate').value, url: document.getElementById('pUrl').value.trim(), live: document.getElementById('pLive').value.trim(), milestones: [], resources: [], history: [{date:now,note:'Project created'}], createdAt: now, updatedAt: now };
+    projects.unshift(p);
+  }
+  saveProjects(projects); renderTagFilters(); renderGrid();
+  closeModal('projectModal');
+  toast(id ? 'Project updated' : 'Project created');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// DELETE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let _pendingDelete = null;
+function deleteProject(id) {
+  const p = projects.find(x=>x.id===id); if (!p) return;
+  _pendingDelete = id;
+  document.getElementById('confirmTitle').textContent = 'Delete Project';
+  document.getElementById('confirmMsg').textContent = `Delete "${p.name}"? This can't be undone.`;
+  document.getElementById('confirmOkBtn').onclick = () => {
+    projects = projects.filter(x=>x.id!==_pendingDelete);
+    notes = notes.filter(n=>n.projectId!==_pendingDelete);
+    saveProjects(projects); saveNotes(notes);
+    closeModal('confirmModal'); closeModal('detailModal');
+    renderTagFilters(); renderGrid(); renderNotes();
+    toast('Project deleted');
+  };
+  document.getElementById('confirmModal').hidden = false;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// NOTES
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderNotes() {
+  const body = document.getElementById('notesBody');
+  let list;
+  if (noteTab === 'global') {
+    list = notes.filter(n=>!n.projectId);
+  } else {
+    list = notes.filter(n=>n.projectId);
+  }
+  list = list.slice().reverse();
+  if (list.length === 0) {
+    body.innerHTML = `<div style="text-align:center;padding:24px 0;color:var(--fg-3);font-size:12px">No notes yet. Add one below.</div>`;
+    return;
+  }
+  body.innerHTML = list.map(n => {
+    const proj = n.projectId ? projects.find(p=>p.id===n.projectId) : null;
+    return `<div class="note-card">
+      ${proj ? `<div class="note-project-tag">📁 ${esc(proj.name)}</div>` : ''}
+      <div class="note-text">${esc(n.text)}</div>
+      <div class="note-time">${formatDate(n.createdAt)}</div>
+      <button class="note-delete" onclick="deleteNote('${n.id}')" title="Delete">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+}
+function addNote() {
+  const input = document.getElementById('noteInput');
+  const text = input.value.trim(); if (!text) return;
+  const projId = (noteTab === 'project' && activeProjectId) ? activeProjectId : null;
+  notes.push({id:uid(),text,projectId:projId,createdAt:new Date().toISOString()});
+  saveNotes(notes); input.value = '';
+  renderNotes(); renderGrid(); // refresh note counts
+}
+function deleteNote(id) {
+  notes = notes.filter(n=>n.id!==id);
+  saveNotes(notes); renderNotes(); renderGrid();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// STATS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function openStats() {
+  const total = projects.length;
+  const byStatus = {active:0,paused:0,done:0,idea:0};
+  const byPriority = {critical:0,high:0,medium:0,low:0};
+  const avgProgress = total ? Math.round(projects.reduce((s,p)=>s+p.progress,0)/total) : 0;
+  const totalNotes = notes.length;
+  projects.forEach(p => { byStatus[p.status]=(byStatus[p.status]||0)+1; byPriority[p.priority]=(byPriority[p.priority]||0)+1; });
+
+  const statusColors = {active:'#22c55e',paused:'#f59e0b',done:'#6366f1',idea:'#8b5cf6'};
+  const priorityColors2 = {critical:'#ef4444',high:'#f97316',medium:'#eab308',low:'#22c55e'};
+  const maxS = Math.max(1,...Object.values(byStatus));
+  const maxP = Math.max(1,...Object.values(byPriority));
+
+  const techCounts = {};
+  projects.forEach(p=>(p.tech||[]).forEach(t=>{techCounts[t]=(techCounts[t]||0)+1;}));
+  const topTech = Object.entries(techCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxT = Math.max(1,...topTech.map(([,c])=>c));
+
+  document.getElementById('statsBody').innerHTML = `
+    <div class="stat-grid">
+      ${sTile(total,'Total Projects')}
+      ${sTile(byStatus.active,'Active')}
+      ${sTile(byStatus.done,'Completed')}
+      ${sTile(avgProgress+'%','Avg Progress')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="chart-wrap">
+        <div class="chart-title">By Status</div>
+        <div class="bar-chart">${Object.entries(byStatus).map(([k,v])=>`
+          <div class="bar-row">
+            <div class="bar-label">${k.charAt(0).toUpperCase()+k.slice(1)}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${v?Math.round(v/maxS*100):0}%;background:${statusColors[k]}">${v||''}</div></div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">By Priority</div>
+        <div class="bar-chart">${Object.entries(byPriority).map(([k,v])=>`
+          <div class="bar-row">
+            <div class="bar-label">${k.charAt(0).toUpperCase()+k.slice(1)}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${v?Math.round(v/maxP*100):0}%;background:${priorityColors2[k]}">${v||''}</div></div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    ${topTech.length ? `<div class="chart-wrap" style="margin-top:12px">
+      <div class="chart-title">Top Tech Stack</div>
+      <div class="bar-chart">${topTech.map(([t,c])=>`
+        <div class="bar-row">
+          <div class="bar-label" style="font-size:11px">${esc(t)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(c/maxT*100)}%;background:var(--accent)">${c}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>` : ''}
+    <div style="margin-top:12px;font-size:12px;color:var(--fg-3);display:flex;gap:16px;flex-wrap:wrap">
+      <span>📝 ${totalNotes} note${totalNotes!==1?'s':''}</span>
+      <span>🎯 ${projects.filter(p=>p.milestones&&p.milestones.length).length} projects with milestones</span>
+      <span>🔗 ${projects.reduce((s,p)=>s+(p.resources||[]).length,0)} saved resources</span>
+    </div>`;
+  document.getElementById('statsModal').hidden = false;
+}
+function sTile(val, label) {
+  return `<div class="stat-card"><div class="stat-num">${val}</div><div class="stat-label">${label}</div></div>`;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// IMPORT / EXPORT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function exportData() {
+  const data = JSON.stringify({projects,notes,exportedAt:new Date().toISOString()},null,2);
+  const blob = new Blob([data],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `project-hub-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Exported successfully');
+}
+function importData() {
+  document.getElementById('importFileInput').click();
+}
+document.getElementById('importFileInput').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.projects && Array.isArray(data.projects)) {
+        projects = data.projects; saveProjects(projects);
+      }
+      if (data.notes && Array.isArray(data.notes)) {
+        notes = data.notes; saveNotes(notes);
+      }
+      renderTagFilters(); renderGrid(); renderNotes();
+      toast(`Imported ${projects.length} projects`);
+    } catch { toast('Import failed — invalid JSON'); }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// MODALS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function closeModal(id) {
+  document.getElementById(id).hidden = true;
+}
+document.querySelectorAll('.modal-backdrop').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['confirmModal','statsModal','detailModal','projectModal'].forEach(id => {
+      if (!document.getElementById(id).hidden) { closeModal(id); }
+    });
+  }
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// THEME
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t || '';
+  if (!t) delete document.documentElement.dataset.theme;
+  const icon = document.getElementById('themeIcon');
+  if (t === 'dark') {
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  } else if (t === 'light') {
+    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  } else {
+    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  }
+}
+document.getElementById('themeToggleBtn').addEventListener('click', () => {
+  const themes = ['','dark','light'];
+  const cur = document.documentElement.dataset.theme || '';
+  const next = themes[(themes.indexOf(cur)+1)%themes.length];
+  prefs.theme = next; savePrefs(prefs);
+  applyTheme(next);
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SIDEBAR TOGGLES
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function toggleFilters() {
+  filterOpen = !filterOpen;
+  document.getElementById('filterSidebar').classList.toggle('collapsed', !filterOpen);
+  prefs.filterOpen = filterOpen; savePrefs(prefs);
+}
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  document.getElementById('notesSidebar').classList.toggle('collapsed', !notesOpen);
+  prefs.notesOpen = notesOpen; savePrefs(prefs);
+  if (notesOpen) renderNotes();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TOAST
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let _toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// WIRE UP EVENTS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+document.getElementById('addProjectBtn').addEventListener('click', openAddModal);
+document.getElementById('saveProjectBtn').addEventListener('click', saveProject);
+document.getElementById('statsBtn').addEventListener('click', openStats);
+document.getElementById('exportBtn').addEventListener('click', exportData);
+document.getElementById('importBtn').addEventListener('click', importData);
+document.getElementById('filterToggleBtn').addEventListener('click', toggleFilters);
+document.getElementById('notesToggleBtn').addEventListener('click', toggleNotes);
+document.getElementById('notesCloseBtn').addEventListener('click', toggleNotes);
+document.getElementById('addNoteBtn').addEventListener('click', addNote);
+document.getElementById('noteInput').addEventListener('keydown', e => { if (e.key==='Enter' && e.ctrlKey) addNote(); });
+document.getElementById('searchInput').addEventListener('input', renderGrid);
+document.getElementById('sortSelect').addEventListener('change', e => { sortBy = e.target.value; prefs.sortBy = sortBy; savePrefs(prefs); renderGrid(); });
+document.getElementById('dateFrom').addEventListener('change', e => { filters.dateFrom = e.target.value; renderGrid(); });
+document.getElementById('dateTo').addEventListener('change', e => { filters.dateTo = e.target.value; renderGrid(); });
+document.getElementById('clearDateBtn').addEventListener('click', () => { filters.dateFrom=''; filters.dateTo=''; document.getElementById('dateFrom').value=''; document.getElementById('dateTo').value=''; renderGrid(); });
+
+document.querySelectorAll('[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const type = btn.dataset.filter, val = btn.dataset.val;
+    filters[type] = val;
+    document.querySelectorAll(`[data-filter="${type}"]`).forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid();
+  });
+});
+
+document.querySelectorAll('.note-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    noteTab = tab.dataset.tab;
+    document.querySelectorAll('.note-tab').forEach(t=>t.classList.toggle('active',t===tab));
+    renderNotes();
+  });
+});
+
+document.getElementById('gridViewBtn').addEventListener('click', () => {
+  viewMode='grid'; prefs.viewMode='grid'; savePrefs(prefs);
+  document.getElementById('projectGrid').classList.remove('list-view');
+  document.getElementById('gridViewBtn').classList.add('active');
+  document.getElementById('listViewBtn').classList.remove('active');
+});
+document.getElementById('listViewBtn').addEventListener('click', () => {
+  viewMode='list'; prefs.viewMode='list'; savePrefs(prefs);
+  document.getElementById('projectGrid').classList.add('list-view');
+  document.getElementById('listViewBtn').classList.add('active');
+  document.getElementById('gridViewBtn').classList.remove('active');
+});
+
+// Enter to save project modal
+document.getElementById('pName').addEventListener('keydown', e => { if (e.key==='Enter') saveProject(); });
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INIT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+(function init() {
+  // Restore prefs
+  if (prefs.theme) applyTheme(prefs.theme);
+  if (prefs.sortBy) { sortBy = prefs.sortBy; document.getElementById('sortSelect').value = sortBy; }
+  if (prefs.viewMode === 'list') {
+    viewMode = 'list';
+    document.getElementById('projectGrid').classList.add('list-view');
+    document.getElementById('listViewBtn').classList.add('active');
+    document.getElementById('gridViewBtn').classList.remove('active');
+  }
+  if (!filterOpen) document.getElementById('filterSidebar').classList.add('collapsed');
+  if (!notesOpen)  document.getElementById('notesSidebar').classList.add('collapsed');
+
+  renderTagFilters();
+  renderGrid();
+  renderNotes();
+})();
+</script>
