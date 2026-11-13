@@ -813,20 +813,111 @@ let projects = loadProjects();
 let notes    = loadNotes();
 let prefs    = loadPrefs();
 
+// ── App idea seed data (60 ideas from research) ─────────────────
+// [category, genre-tag, est-monthly-rev, name, description, dau-needed, drawback, fix, tech[]]
+const APP_IDEAS = [
+ ["Health","health","$150k–400k","Water intake reminder","Daily water goal by weight and weather with smart reminders","1.5k–3k","Reminders stop firing after a few days; paywall right after onboarding","Use exact alarms + quiet hours; keep logging and reminders free, earn from rewarded themes",["Android","Kotlin","AdMob"]],
+ ["Health","health","$300k–1M","Step counter","Pedometer with daily goal and weekly chart","1.5k–3k","Battery drain and counts differ from phone's own count","Read steps from Health Connect / HealthKit instead of polling the sensor",["Android","Kotlin","Health Connect","AdMob"]],
+ ["Health","health","$1M–5M","Intermittent fasting timer","16:8, 18:6, OMAD timers with history","1.5k–3k","Basic timer locked behind a $70/yr subscription","Free timer, stages and history; ads only on the history screen",["Flutter","Dart","AdMob"]],
+ ["Health","health","$50k–200k","Blood pressure log","Log readings, trends, doctor-ready report","1.5k–3k","PDF export is paywalled; no large-text mode","Free PDF export, big buttons for older users (high-eCPM US audience)",["Flutter","Dart","AdMob"]],
+ ["Health","health","$500k–2M","White noise and sleep sounds","Fan, rain, brown noise with timer","1.5k–3k","Audible gap when loop restarts; ad plays at night","Gapless loops, no ads while audio plays, one ad on app open",["Android","ExoPlayer","AdMob"]],
+ ["Productivity","tools","$200k–800k","Habit tracker","Streaks, reminders, home-screen widget","2k–4k","Only 3 habits free; data lost after phone change","Unlimited habits, one-tap local and cloud backup",["Flutter","Dart","AdMob"]],
+ ["Productivity","tools","$50k–300k","Pomodoro focus timer","25/5 timer with stats and white noise","2k–4k","Timer pauses or dies when screen locks","Store end time and use a foreground notification so it survives lock",["Android","Kotlin","AdMob"]],
+ ["Tools","tools","$300k–1.5M","QR and barcode scanner","Scan, create, history","2k–4k","Full-screen ad after every scan; links open without warning","One interstitial per session, URL preview with safety check before opening",["Android","Kotlin","ML Kit","AdMob"]],
+ ["Tools","tools","$2M+","Document / PDF scanner","Camera to clean PDF, share and OCR","2k–4k","Watermark on exports and export paywalled","Free clean export; rewarded ad unlocks OCR text copy",["Android","Kotlin","ML Kit","AdMob"]],
+ ["Tools","tools","$20k–100k","Unit converter","Cooking, length, currency, fully offline","3k–4k","Banner covers keypad; needs internet","Banner at top, fully offline, favorites row",["Flutter","Dart","AdMob"]],
+ ["Tools","tools","$20k–80k","Bubble level and ruler","Spirit level, angle finder, on-screen ruler","3k–4k","Inaccurate out of the box","Two-step calibration on first launch, hold-to-lock reading",["Android","Kotlin","AdMob"]],
+ ["Tools","tools","$30k–150k","Decibel / sound meter","Live dB with history and noise-level labels","3k–4k","Readings far off from real meters","Calibration offset and clear 'approximate' labeling, export readings",["Android","Kotlin","AdMob"]],
+ ["Tools","tools","$10k–50k","Tip and bill splitter","Split with tax, uneven shares, rounding","3k–4k","Cannot split unevenly or include tax correctly","Per-person items, tax and tip toggle",["Flutter","Dart","AdMob"]],
+ ["Finance","finance","$200k–1M","Expense tracker","Quick-add spending, categories, monthly view","1k–2k","Manual entry is slow; CSV export behind paywall","Home widget for 2-tap entry, free CSV export",["Flutter","Dart","AdMob"]],
+ ["Finance","finance","$30k–150k","Mortgage and loan calculator","Payments, amortization, extra-payment savings","1k–2k","No amortization table; ads look like loan offers","Full schedule and extra-payment chart, block misleading lending ads",["Flutter","Dart","AdMob"]],
+ ["Finance","finance","$50k–250k","Subscription tracker","Track renewals, get reminded before charges","1k–2k","Requires bank login; feels unsafe","Manual entry, no account, on-device only",["Flutter","Dart","AdMob"]],
+ ["Education","edu","$100k–500k","Driving permit test prep","Question bank by US state or UK theory test","2k–3k","Outdated questions; paywall after 10 questions","Current question bank per state, free mock tests, rewarded ad for explanations",["Flutter","Dart","AdMob"]],
+ ["Education","edu","$50k–300k","Vocabulary / word of the day","Daily word, widget, quiz","2k–3k","Words repeat; widget does not refresh","Spaced repetition, widget updates daily",["Flutter","Dart","AdMob"]],
+ ["Education","edu","$100k–600k","Flashcards and quiz maker","Make decks, study with spaced repetition","2k–3k","Free tier gutted by market leaders","Free unlimited decks, import from CSV",["Flutter","Dart","AdMob"]],
+ ["Education","kids","$50k–200k","Times tables for kids","Games and drills for multiplication","4k+","Inappropriate ads shown to children","Families-certified ads only, parent gate, no external links",["Flutter","Dart","AdMob"]],
+ ["Lifestyle","life","$100k–500k","Daily Bible verse","Verse, reflection, reminder, share card","2k–4k","Ads with off-topic or offensive content","Block sensitive ad categories, rewarded ad for themes",["Flutter","Dart","AdMob"]],
+ ["Lifestyle","life","$20k–100k","Event countdown widget","Days until trips, birthdays, holidays","3k–4k","Widget stops updating or shows wrong days","Midnight refresh, photo backgrounds, free widgets",["Android","Kotlin","AdMob"]],
+ ["Music","music","$100k–500k","Guitar tuner","Chromatic tuner plus alternate tunings","2k–4k","Laggy pitch detection; alternate tunings paywalled","Native pitch detection module, all tunings free, rewarded chord library packs",["Android","Kotlin","AdMob"]],
+ ["Music","music","$20k–100k","Metronome","BPM, time signatures, tap tempo","3k–4k","Beat drifts out of time; stops in background","Schedule clicks on native audio clock, background audio",["Android","Kotlin","AdMob"]],
+ ["Music","music","$50k–300k","Ringtone maker","Cut any song into a ringtone or alarm (Android)","2k–4k","Ad after every action; crashes on long files","Ad only after saving, stream the waveform instead of full load",["Android","Kotlin","AdMob"]],
+ ["Games","games","$500k–3M","Sudoku","Daily puzzles, 4 difficulties, notes","700–1.5k","Ads pop up mid-puzzle","Interstitial only between puzzles, rewarded hints",["Flutter","Dart","AdMob"]],
+ ["Games","games","$300k–2M","Word search","Themed packs, large-text mode","700–1.5k","Ad every level; tiny letters for older players","Large-text mode, ad every 3 levels, rewarded 'find a word'",["Flutter","Dart","AdMob"]],
+ ["Games","games","$1M–5M","Solitaire","Classic Klondike with daily challenge","700–1.5k","Unwinnable deals and forced ads","'Winnable deals only' option, ad frequency cap",["Flutter","Dart","AdMob"]],
+ ["Games","games","$1M–10M","Block puzzle","Fit blocks on an 8×8 grid","700–1.5k","Rigged-feeling pieces, 30-second ads after each round","Fair random pieces, short skippable ads, rewarded 'continue'",["Flutter","Dart","AdMob"]],
+ ["Games","games","$500k–3M","Color sort puzzle","Sort colored balls or water into tubes","700–1.5k","Unskippable ads every level; levels repeat","Ad every 3–4 levels, generated levels, rewarded 'extra tube'",["Flutter","Dart","AdMob"]],
+ ["Health","health","$200k–800k","Simple calorie counter","Quick food log with barcode scan","1.5k–3k","Barcode scanning and macros locked behind subscription","Free barcode lookup via Open Food Facts, quick re-add recent meals",["Flutter","Dart","Open Food Facts API","AdMob"]],
+ ["Health","health","$100k–400k","Home workout — no equipment","7- and 20-minute routines with voice cues","1.5k–3k","Same routines every day; voice cues cut out","Randomized circuits by muscle group, offline audio cues",["Flutter","Dart","AdMob"]],
+ ["Sports","health","$50k–250k","Run/walk interval trainer","Couch-to-5K style plan with audio prompts","1.5k–3k","Prompts stop when music app plays or screen locks","Audio ducking over music, background-safe timer",["Android","Kotlin","AdMob"]],
+ ["Sports","tools","$30k–150k","Score keeper","Scores for card games, board games, pickleball","3k–4k","Ads cover score buttons; scores reset on rotate","Persist every tap, ads only on summary screen",["Flutter","Dart","AdMob"]],
+ ["Productivity","tools","$100k–500k","Shift work calendar","Rotating shift patterns for nurses, police, factory staff","2k–4k","Pattern setup is confusing; no calendar export","Built-in templates (4-on-4-off, Pitman, DuPont), export to phone calendar",["Flutter","Dart","AdMob"]],
+ ["Productivity","tools","$50k–250k","Quick notes with widget","Sticky-note style notes on the home screen","2k–4k","Sync bugs lose notes","Local-first storage, optional backup file",["Android","Kotlin","AdMob"]],
+ ["Tools","tools","$100k–400k","Flashlight with SOS and strobe","One-tap torch, SOS, screen light","3k–4k","Asks for contacts and location for no reason","Zero extra permissions; call that out in the store listing",["Android","Kotlin","AdMob"]],
+ ["Tools","tools","$100k–500k","Wi-Fi analyzer","Signal strength and channel finder (Android)","2k–4k","Jargon-heavy; users don't know what to change","Plain-language 'best channel for your router' tip",["Android","Kotlin","AdMob"]],
+ ["Finance","finance","$50k–200k","Take-home pay calculator","US state taxes and UK PAYE / National Insurance","1k–2k","Outdated tax tables give wrong numbers","Update tables each tax year, show the year on screen",["Flutter","Dart","AdMob"]],
+ ["Finance","finance","$30k–150k","Savings goal jar","Visual goals with deposits and progress","1k–2k","No reminders, users forget to log","Payday reminders and a progress widget",["Flutter","Dart","AdMob"]],
+ ["Education","edu","$100k–400k","US citizenship test prep","Civics questions with audio","2k–3k","Old question set and no audio","Current civics set with audio; fills in your state's officials",["Flutter","Dart","AdMob"]],
+ ["Education","edu","$50k–250k","Learn sign language","Alphabet, words, daily practice (ASL / BSL)","2k–3k","Paywall right after the alphabet; low-quality videos","Free core vocabulary, rewarded ads unlock themed packs",["Flutter","Dart","AdMob"]],
+ ["Education","kids","$50k–200k","Toddler ABC and phonics","Tap letters, hear sounds, tracing","4k+","Toddlers tap ads by accident","Parent gate on all ads, ads only on the parent screen",["Flutter","Dart","AdMob"]],
+ ["Music","music","$100k–500k","Drum pads and beat maker","Pads, loops, record and share","2k–4k","Audio lag between tap and sound","Low-latency native audio module, preloaded samples",["Android","Kotlin","AdMob"]],
+ ["Music","music","$50k–200k","Vocal range and pitch trainer","Find your range, sing-along pitch drills","2k–4k","Pitch detection jumps around","Smoothed pitch readout, mic noise calibration",["Android","Kotlin","AdMob"]],
+ ["Games","games","$1M–5M","Mahjong tile matching","Classic tile-match solitaire","700–1.5k","Tiles too small for older players","Large-tile mode, zoom, ad every few boards",["Flutter","Dart","AdMob"]],
+ ["Games","games","$300k–2M","Nonogram / picture cross","Logic grid puzzles that reveal pictures","700–1.5k","Mistakes punished with ads; few free puzzles","Unlimited generated puzzles, rewarded 'check row'",["Flutter","Dart","AdMob"]],
+ ["Games","games","$1M–5M","Jigsaw puzzles","Daily photo jigsaws, 36–400 pieces","700–1.5k","Pictures locked behind coins","Daily free puzzle, rewarded ads unlock packs",["Flutter","Dart","AdMob"]],
+ ["Games","games","$200k–1M","Trivia quiz","Daily trivia by topic, US / UK","700–1.5k","Questions repeat quickly","Large question bank, no repeats for 30 days",["Flutter","Dart","AdMob"]],
+ ["Games","games","$300k–1.5M","Idle tycoon","Build a lemonade or coffee empire offline","700–1.5k","Progress walls force ad watching","Rewarded ads as optional boosts only, fair offline earnings",["Flutter","Dart","AdMob"]],
+ ["Photo & Video","photo","$200k–1M","Background remover","Cut out people and products for listings","2k–4k","Watermark and low-resolution export","On-device cutout, full-res export after a rewarded ad",["Android","Kotlin","ML Kit","AdMob"]],
+ ["Photo & Video","photo","$100k–500k","Video compressor","Shrink videos to send by email or chat","2k–4k","Watermark and quality loss","No watermark, size target presets (e.g. under 25 MB)",["Android","Kotlin","FFmpeg","AdMob"]],
+ ["Travel","travel","$50k–250k","Packing list","Lists by trip type and weather","1.5k–3k","Lists can't be reused or shared","Templates, duplicate past trips, share as text",["Flutter","Dart","AdMob"]],
+ ["Travel","travel","$30k–150k","Fuel cost and mileage log","Trip fuel cost, MPG, expense mileage","1.5k–3k","No export for mileage claims","Free CSV/PDF export for tax or employer claims",["Flutter","Dart","AdMob"]],
+ ["Food","life","$100k–500k","Recipe saver with cooking mode","Save recipes from any website","2k–4k","Import fails; screen sleeps while cooking","Reliable recipe parsing, keep-awake cooking mode, no ads in cooking mode",["Flutter","Dart","AdMob"]],
+ ["Food","life","$30k–150k","Shared grocery list","One list for the household","2k–4k","Forced account sign-up to share","Share by link or code, no account required",["Flutter","Dart","Firebase","AdMob"]],
+ ["Pets","life","$50k–200k","Pet care tracker","Vaccines, meds, feeding, vet visits","2k–4k","Reminders unreliable; one pet only free","Multiple pets free, exact-time reminders",["Flutter","Dart","AdMob"]],
+ ["Weather","life","$1M+","Simple rain alert weather","Next-hour rain alerts and clean forecast","2k–4k","Too many ads and location data sold","Light ads, no data selling, clear privacy label",["Flutter","Dart","Weather API","AdMob"]],
+ ["Parenting","life","$100k–500k","Baby feeding and sleep log","Breast/bottle, diapers, naps tracker","2k–4k","Hard to use one-handed at 3 a.m.","Big one-tap buttons, dark night mode, partner sharing",["Flutter","Dart","AdMob"]],
+ ["Entertainment","life","$100k–400k","HD wallpapers","Curated wallpapers by theme","2k–4k","Ad between every wallpaper; low resolution","Ad only on download, true device-resolution images",["Flutter","Dart","AdMob"]]
+];
+
+function revToPriority(rev) {
+  if (/\$[1-9]\d*M/.test(rev)) return 'high';
+  if (/\$[2-9]\d{2}k/.test(rev) || /\$1M/.test(rev)) return 'medium';
+  return 'low';
+}
+
 // Seed sample data if empty
 if (projects.length === 0) {
   const now = Date.now();
-  projects = [
-    { id: uid(), name: 'Portfolio Website v3', description: 'Complete redesign of personal portfolio with new case studies, blog, and project showcase.', status: 'active', priority: 'high', progress: 65, tech: ['Next.js','Tailwind CSS','Framer Motion'], tags: ['frontend','personal','design'], goals: 'Ship by Q1. Add 5 case studies, improve performance score to 95+.', startDate: '2026-09-01', targetDate: '2026-12-31', url: 'https://github.com/example/portfolio', live: 'https://example.dev', milestones: [{id:uid(),text:'Wireframes complete',done:true},{id:uid(),text:'Dev environment set up',done:true},{id:uid(),text:'Home page done',done:false},{id:uid(),text:'Case studies written',done:false}], resources: [{id:uid(),label:'Design file',url:'https://figma.com'},{id:uid(),label:'Reference site',url:'https://brittanychiang.com'}], history: [{date:new Date(now-7*864e5).toISOString(),note:'Status changed to active'},{date:new Date(now-2*864e5).toISOString(),note:'Progress updated to 65%'}], createdAt: new Date(now-30*864e5).toISOString(), updatedAt: new Date(now-864e5).toISOString() },
-    { id: uid(), name: 'CLI Task Manager', description: 'Rust-based command-line tool for managing tasks with SQLite persistence and sync.', status: 'active', priority: 'medium', progress: 30, tech: ['Rust','SQLite','Clap'], tags: ['cli','tool','learning'], goals: 'Learn Rust patterns. Ship v1.0 to crates.io.', startDate: '2026-10-15', targetDate: '2027-02-28', url: 'https://github.com/example/task-cli', live: '', milestones: [{id:uid(),text:'Core data model',done:true},{id:uid(),text:'Add/complete commands',done:false},{id:uid(),text:'Sync feature',done:false}], resources: [], history: [{date:new Date(now-10*864e5).toISOString(),note:'Project created'}], createdAt: new Date(now-10*864e5).toISOString(), updatedAt: new Date(now-3*864e5).toISOString() },
-    { id: uid(), name: 'AI Recipe Generator', description: 'Web app that generates personalized recipes based on ingredients in your fridge using Claude API.', status: 'idea', priority: 'low', progress: 0, tech: ['Python','FastAPI','React','Claude API'], tags: ['ai','side-project','food'], goals: 'Validate idea. Build MVP in a weekend.', startDate: '', targetDate: '', url: '', live: '', milestones: [], resources: [{id:uid(),label:'Claude API docs',url:'https://docs.anthropic.com'}], history: [{date:new Date(now-5*864e5).toISOString(),note:'Idea noted'}], createdAt: new Date(now-5*864e5).toISOString(), updatedAt: new Date(now-5*864e5).toISOString() },
-    { id: uid(), name: 'Open Source UI Kit', description: 'Accessible React component library with dark mode, TypeScript, and comprehensive Storybook docs.', status: 'paused', priority: 'medium', progress: 45, tech: ['React','TypeScript','Storybook','Radix UI'], tags: ['open-source','library','design-system'], goals: 'Reach 20 components. Publish to npm.', startDate: '2026-07-01', targetDate: '2027-03-31', url: 'https://github.com/example/ui-kit', live: '', milestones: [{id:uid(),text:'Button, Input, Select',done:true},{id:uid(),text:'Modal, Drawer, Toast',done:true},{id:uid(),text:'Data table',done:false},{id:uid(),text:'Form validation helpers',done:false}], resources: [], history: [{date:new Date(now-60*864e5).toISOString(),note:'Project started'},{date:new Date(now-14*864e5).toISOString(),note:'Status changed to paused — focusing on portfolio'}], createdAt: new Date(now-60*864e5).toISOString(), updatedAt: new Date(now-14*864e5).toISOString() },
-    { id: uid(), name: 'Workout Tracker App', description: 'React Native app for logging workouts, tracking PRs, and visualizing progress over time.', status: 'done', priority: 'low', progress: 100, tech: ['React Native','Expo','SQLite','Victory Native'], tags: ['mobile','health','personal'], goals: 'Use daily. Track 6 months of data.', startDate: '2026-01-01', targetDate: '2026-06-30', url: 'https://github.com/example/workout', live: '', milestones: [{id:uid(),text:'Core logging',done:true},{id:uid(),text:'Progress charts',done:true},{id:uid(),text:'Streak tracking',done:true}], resources: [], history: [{date:new Date(now-120*864e5).toISOString(),note:'Project started'},{date:new Date(now-60*864e5).toISOString(),note:'v1.0 shipped'},{date:new Date(now-30*864e5).toISOString(),note:'Status set to done'}], createdAt: new Date(now-150*864e5).toISOString(), updatedAt: new Date(now-30*864e5).toISOString() }
-  ];
+  projects = APP_IDEAS.map((row, i) => {
+    const [cat, , rev, name, desc, dau, drawback, fix, tech] = row;
+    return {
+      id: uid(),
+      name,
+      description: desc,
+      status: 'idea',
+      priority: revToPriority(rev),
+      progress: 0,
+      tech,
+      tags: [cat.toLowerCase().replace(/\s+&\s+/g,'-').replace(/\s+/g,'-'), 'app-idea', 'admob', 'mobile'],
+      goals: fix,
+      startDate: '', targetDate: '',
+      url: '', live: '',
+      milestones: [
+        {id:uid(),text:'Research competitors on Sensor Tower',done:false},
+        {id:uid(),text:'Build MVP',done:false},
+        {id:uid(),text:'Submit to Play Store',done:false},
+        {id:uid(),text:'Reach $100/day',done:false}
+      ],
+      resources: [{id:uid(),label:'Est. monthly revenue (top apps): '+rev,url:'https://sensortower.com'},{id:uid(),label:'DAU needed: '+dau,url:'https://www.appodeal.com/the-mobile-ecpm-report-updated-q4-2024-view'}],
+      history: [{date:new Date(now - (APP_IDEAS.length-i)*3600000).toISOString(),note:'Imported from App Ideas research list'}],
+      notes_meta: {drawback},
+      createdAt: new Date(now - (APP_IDEAS.length-i)*3600000).toISOString(),
+      updatedAt: new Date(now - (APP_IDEAS.length-i)*3600000).toISOString()
+    };
+  });
   saveProjects(projects);
   notes = [
-    { id: uid(), text: 'Focus this month: portfolio + CLI tool. Keep scope tight.', projectId: null, createdAt: new Date(now-864e5).toISOString() },
-    { id: uid(), text: 'Look into Incremental Static Regeneration for the portfolio blog section.', projectId: projects[0].id, createdAt: new Date(now-2*864e5).toISOString() }
+    { id: uid(), text: 'Imported 60 app ideas from research. All target ~$100/day with AdMob. Focus on categories with high eCPM: Finance, Health, Education.', projectId: null, createdAt: new Date().toISOString() },
+    { id: uid(), text: 'Best quick wins: Document Scanner, PDF tools and Intermittent Fasting Timer — proven $1M+/mo markets with clear UX gaps to fill.', projectId: null, createdAt: new Date().toISOString() }
   ];
   saveNotes(notes);
 }
