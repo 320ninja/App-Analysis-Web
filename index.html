@@ -786,9 +786,10 @@ body::before {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // DATA
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const STORAGE_KEY = 'projecthub_v2';
-const NOTES_KEY   = 'projecthub_notes';
-const PREFS_KEY   = 'projecthub_prefs';
+const STORAGE_KEY  = 'projecthub_v2';
+const NOTES_KEY    = 'projecthub_notes';
+const PREFS_KEY    = 'projecthub_prefs';
+const SEED_VERSION = 'v3_60apps'; // bump to force re-seed
 
 function loadProjects() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
@@ -884,8 +885,12 @@ function revToPriority(rev) {
   return 'low';
 }
 
-// Seed sample data if empty
-if (projects.length === 0) {
+// Seed sample data if empty or outdated seed
+const storedSeedVer = (function(){ try{return localStorage.getItem('projecthub_seed')||'';}catch{return '';} })();
+if (projects.length === 0 || storedSeedVer !== SEED_VERSION) {
+  // keep any user-added projects (not idea-status from old seed)
+  const userProjects = storedSeedVer ? projects.filter(p => p._user) : [];
+  if (userProjects.length > 0) projects = userProjects;
   const now = Date.now();
   projects = APP_IDEAS.map((row, i) => {
     const [cat, , rev, name, desc, dau, drawback, fix, tech] = row;
@@ -920,6 +925,7 @@ if (projects.length === 0) {
     { id: uid(), text: 'Best quick wins: Document Scanner, PDF tools and Intermittent Fasting Timer — proven $1M+/mo markets with clear UX gaps to fill.', projectId: null, createdAt: new Date().toISOString() }
   ];
   saveNotes(notes);
+  try{localStorage.setItem('projecthub_seed', SEED_VERSION);}catch{}
 }
 
 function uid() {
