@@ -67,6 +67,8 @@ select.sb-select{width:100%;margin-top:4px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:.2s;position:relative}
 .card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--border2)}
+#tableWrap tbody tr:hover{background:var(--surface2)}
+#tableWrap tbody tr:nth-child(even){background:rgba(255,255,255,.02)}
 .card-header{height:72px;display:flex;align-items:center;padding:0 16px;gap:12px;position:relative;overflow:hidden}
 .card-header::before{content:'';position:absolute;inset:0;opacity:.15}
 .card-emoji{font-size:28px;position:relative;z-index:1}
@@ -242,8 +244,10 @@ select.sb-select{width:100%;margin-top:4px}
         <option value="name">Sort: Name</option>
         <option value="status">Sort: Status</option>
       </select>
+      <button id="viewToggleBtn" onclick="toggleView()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:13px;white-space:nowrap">⊞ Table View</button>
     </div>
     <div class="grid" id="grid"></div>
+    <div id="tableWrap" style="display:none;overflow-x:auto"></div>
   </main>
 </div>
 
@@ -282,6 +286,7 @@ select.sb-select{width:100%;margin-top:4px}
         <option value="">Auto-detect from difficulty</option>
       </select>
     </div>
+    <div class="form-row"><label>App Store / Play Store URL</label><input id="fUrl" placeholder="https://apps.apple.com/… or https://play.google.com/…"></div>
     <div class="form-row"><label>Notes</label><textarea id="fNotes" rows="3" placeholder="Any additional thoughts…"></textarea></div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="closeAddDirect()">Cancel</button>
@@ -495,7 +500,7 @@ const STATUS_TEXT={idea:'💡 Idea',building:'🔨 Building',launched:'🚀 Laun
 const DIFFS=['Very Easy','Easy','Medium','Hard','Very Hard','Expert'];
 
 const SK='projecthub_v2',NK='projecthub_notes',PK='projecthub_prefs',FK='projecthub_favs';
-const SEED_KEY='projecthub_seed',SEED_VER='v5_redesign_6';
+const SEED_KEY='projecthub_seed',SEED_VER='v5_redesign_7';
 
 function parseMonthly(rev){
   if(!rev)return 0;
@@ -1572,16 +1577,65 @@ function getFiltered(){
   return r;
 }
 
+let viewMode='cards';
+function toggleView(){
+  viewMode=viewMode==='cards'?'table':'cards';
+  document.getElementById('viewToggleBtn').textContent=viewMode==='cards'?'⊞ Table View':'⊟ Card View';
+  render();
+}
 function render(){
   const list=getFiltered();
   document.getElementById('countBadge').textContent=list.length+' app'+(list.length!==1?'s':'');
   const grid=document.getElementById('grid');
+  const tWrap=document.getElementById('tableWrap');
   if(!list.length){
+    grid.style.display='grid'; tWrap.style.display='none';
     grid.innerHTML='<div class="empty" style="grid-column:1/-1"><h3>No apps found</h3><p>Try adjusting your filters</p></div>';
-    return;
+    updateHeaderStats(); return;
   }
-  grid.innerHTML=list.map(p=>renderCard(p)).join('');
+  if(viewMode==='table'){
+    grid.style.display='none'; tWrap.style.display='block';
+    tWrap.innerHTML=renderTable(list);
+  } else {
+    tWrap.style.display='none'; grid.style.display='grid';
+    grid.innerHTML=list.map(p=>renderCard(p)).join('');
+  }
   updateHeaderStats();
+}
+function renderTable(list){
+  const rows=list.map(p=>{
+    const c=CAT[p.cat]||{emoji:'📱',color:'#6366f1'};
+    const e=getEarnings(p.rev);
+    const d=getDiff(p.rev);
+    const ec=EARN_COLORS[getEarn(p)]||'#6366f1';
+    const url=p.url||'';
+    const feats=(p.feats||[]).join(', ');
+    return`<tr onclick="openDetail('${p.id}')" style="cursor:pointer">
+      <td style="padding:10px 12px;white-space:nowrap;font-weight:600">${esc(p.name)}</td>
+      <td style="padding:10px 12px;white-space:nowrap"><span style="color:${c.color}">${c.emoji} ${p.cat}</span></td>
+      <td style="padding:10px 12px;white-space:nowrap"><span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${d.color}22;color:${d.color}">${d.label}</span></td>
+      <td style="padding:10px 12px;white-space:nowrap"><span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${ec}22;color:${ec}">${getEarn(p)}</span></td>
+      <td style="padding:10px 12px;white-space:nowrap;font-weight:700;color:#22c55e">$${e.daily}/d</td>
+      <td style="padding:10px 12px;white-space:nowrap">$${e.monthly}/mo</td>
+      <td style="padding:10px 12px;font-size:12px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(feats)}">${esc(feats)}</td>
+      <td style="padding:10px 12px;text-align:center">${url?`<a href="${esc(url)}" target="_blank" onclick="event.stopPropagation()" style="color:#38bdf8;font-size:12px">🔗 View</a>`:'<span style="color:#666;font-size:11px">—</span>'}</td>
+    </tr>`;
+  }).join('');
+  return`<table style="width:100%;border-collapse:collapse;font-size:13px;color:var(--text)">
+    <thead>
+      <tr style="background:var(--surface2);position:sticky;top:0;z-index:2">
+        <th style="padding:10px 12px;text-align:left;white-space:nowrap;font-weight:700;border-bottom:1px solid var(--border)">App Name</th>
+        <th style="padding:10px 12px;text-align:left;white-space:nowrap;font-weight:700;border-bottom:1px solid var(--border)">Category</th>
+        <th style="padding:10px 12px;text-align:left;white-space:nowrap;font-weight:700;border-bottom:1px solid var(--border)">Difficulty</th>
+        <th style="padding:10px 12px;text-align:left;white-space:nowrap;font-weight:700;border-bottom:1px solid var(--border)">Earn Method</th>
+        <th style="padding:10px 12px;text-align:left;white-space:nowrap;font-weight:700;border-bottom:1px solid var(--border)">Daily $$</th>
+        <th style="padding:10px 12px;text-align:left;white-space:nowrap;font-weight:700;border-bottom:1px solid var(--border)">Monthly</th>
+        <th style="padding:10px 12px;text-align:left;font-weight:700;border-bottom:1px solid var(--border)">Features</th>
+        <th style="padding:10px 12px;text-align:center;white-space:nowrap;font-weight:700;border-bottom:1px solid var(--border)">Link</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
 }
 function renderCard(p){
   const c=CAT[p.cat]||{emoji:'📱',color:'#6366f1',bg:'linear-gradient(135deg,#312e81,#3730a3)'};
@@ -1692,6 +1746,7 @@ function renderTabContent(idx,p,e,d,c){
         <div class="info-card"><label>Target Audience</label><div class="val">${esc(p.aud||'—')}</div></div>
         <div class="info-card"><label>Priority</label><div class="val">${p.priority||'medium'}</div></div>
         <div class="info-card" style="grid-column:1/-1"><label>Earning Method</label><div class="val" style="color:${EARN_COLORS[getEarn(p)]}">💲 ${getEarn(p)}</div></div>
+        ${p.url?`<div class="info-card" style="grid-column:1/-1"><label>App Store / Play Store</label><div class="val"><a href="${esc(p.url)}" target="_blank" style="color:#38bdf8;text-decoration:none">🔗 ${esc(p.url)}</a></div></div>`:''}
       </div>
       <div class="section-title">📋 Description</div>
       <p style="font-size:14px;line-height:1.7;color:var(--text2);margin-bottom:16px">${esc(p.desc||'')}</p>
@@ -1756,6 +1811,7 @@ function editModal(){
   document.getElementById('fRev').value=p.rev||'';
   document.getElementById('fAud').value=p.aud||'';
   document.getElementById('fFeats').value=(p.feats||[]).join(', ');
+  document.getElementById('fUrl').value=p.url||'';
   document.getElementById('fNotes').value=notes[activeId]||'';
   closeDetailDirect();
   document.getElementById('addOverlay').classList.add('open');
@@ -1770,6 +1826,7 @@ function showAdd(){
   document.getElementById('fRev').value='';
   document.getElementById('fAud').value='';
   document.getElementById('fFeats').value='';
+  document.getElementById('fUrl').value='';
   document.getElementById('fNotes').value='';
   document.getElementById('addOverlay').classList.add('open');
 }
@@ -1783,11 +1840,12 @@ function saveAdd(){
   const feats=featsRaw?featsRaw.split(',').map(f=>f.trim()).filter(Boolean):[];
   const id='u'+Date.now();
   const monVal=document.getElementById('fMon').value;
+  const urlVal=document.getElementById('fUrl').value.trim();
   const p={id,name,cat,
     desc:document.getElementById('fDesc').value.trim(),
     rev:document.getElementById('fRev').value.trim(),
     aud:document.getElementById('fAud').value.trim(),
-    feats,mon:monVal||undefined,priority:'medium',status:'idea',createdAt:Date.now()};
+    feats,mon:monVal||undefined,url:urlVal||undefined,priority:'medium',status:'idea',createdAt:Date.now()};
   const noteText=document.getElementById('fNotes').value.trim();
   if(noteText)notes[id]=noteText;
   projects.unshift(p);
