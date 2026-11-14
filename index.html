@@ -211,6 +211,10 @@ select.sb-select{width:100%;margin-top:4px}
       <div class="filter-group" id="diffFilters"></div>
     </div>
     <div class="sb-section">
+      <div class="sb-title">Earning Method</div>
+      <div class="filter-group" id="earnFilters"></div>
+    </div>
+    <div class="sb-section">
       <div class="sb-title">Status</div>
       <div class="filter-group" id="statusFilters"></div>
     </div>
@@ -273,6 +277,11 @@ select.sb-select{width:100%;margin-top:4px}
     <div class="form-row"><label>Revenue Estimate</label><input id="fRev" placeholder="e.g. $50k–150k/mo"></div>
     <div class="form-row"><label>Target Audience</label><input id="fAud" placeholder="e.g. Fitness enthusiasts"></div>
     <div class="form-row"><label>Key Features (comma-separated)</label><input id="fFeats" placeholder="e.g. Workout tracker, Nutrition log"></div>
+    <div class="form-row"><label>Earning Method</label>
+      <select id="fMon">
+        <option value="">Auto-detect from difficulty</option>
+      </select>
+    </div>
     <div class="form-row"><label>Notes</label><textarea id="fNotes" rows="3" placeholder="Any additional thoughts…"></textarea></div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="closeAddDirect()">Cancel</button>
@@ -450,13 +459,27 @@ function getBuildGuide(cat){
   ];
 }
 
+const EARN_METHODS=['Free (Ads)','Free + IAP','One-Time Purchase','Weekly Sub','Monthly Sub','3-Day Trial + Weekly','3-Day Trial + Monthly'];
+const EARN_COLORS={'Free (Ads)':'#06b6d4','Free + IAP':'#22c55e','One-Time Purchase':'#f59e0b','Weekly Sub':'#8b5cf6','Monthly Sub':'#6366f1','3-Day Trial + Weekly':'#ec4899','3-Day Trial + Monthly':'#f97316'};
+const DEFAULT_EARN={'Health':'3-Day Trial + Monthly','Finance':'Monthly Sub','Games':'Free + IAP','Music':'Monthly Sub','Tools':'One-Time Purchase','Education':'3-Day Trial + Monthly','Photo & Video':'Monthly Sub','Travel':'One-Time Purchase','Food':'Free (Ads)','Pets':'Free + IAP','Weather':'Free (Ads)','Parenting':'Monthly Sub','Sports':'Free + IAP','Entertainment':'Free (Ads)'};
+function getEarn(p){
+  if(p.mon)return p.mon;
+  const diff=getDiff(p.rev).label;
+  if(diff==='Very Easy')return'Free (Ads)';
+  if(diff==='Easy'){
+    if(p.cat==='Tools'||p.cat==='Games')return'One-Time Purchase';
+    if(p.cat==='Health'||p.cat==='Education')return'Free + IAP';
+    return'Free + IAP';
+  }
+  return DEFAULT_EARN[p.cat]||'Monthly Sub';
+}
 const STATUSES=['idea','building','launched','paused'];
 const STATUS_COLORS={idea:'rgba(99,102,241,.2)',building:'rgba(234,179,8,.2)',launched:'rgba(34,197,94,.2)',paused:'rgba(239,68,68,.2)'};
 const STATUS_TEXT={idea:'💡 Idea',building:'🔨 Building',launched:'🚀 Launched',paused:'⏸ Paused'};
 const DIFFS=['Very Easy','Easy','Medium','Hard','Very Hard','Expert'];
 
 const SK='projecthub_v2',NK='projecthub_notes',PK='projecthub_prefs',FK='projecthub_favs';
-const SEED_KEY='projecthub_seed',SEED_VER='v5_redesign_4';
+const SEED_KEY='projecthub_seed',SEED_VER='v5_redesign_5';
 
 function parseMonthly(rev){
   if(!rev)return 0;
@@ -808,10 +831,113 @@ const SEED_APPS=[
   {name:'SleepDiary',cat:'Health',desc:'Clinical sleep diary for CBT-I insomnia treatment with sleep efficiency calculator.',rev:'$15k–40k',aud:'Insomnia sufferers in therapy',feats:['Sleep diary','Sleep efficiency calc','Sleep restriction guide','Doctor export'],priority:'medium',status:'idea'},
   {name:'BonsaiCare',cat:'Pets',desc:'Bonsai tree care guide, watering and repotting schedule with species-specific advice.',rev:'$15k–30k',aud:'Bonsai hobbyists',feats:['Species care guide','Watering schedule','Repotting reminder','Growth photo log'],priority:'low',status:'idea'},
   {name:'ColorBlind',cat:'Tools',desc:'Colorblind simulator and accessibility checker for designers and developers.',rev:'$15k–35k',aud:'Designers and accessibility testers',feats:['8 colorblind modes','Photo simulation','Contrast checker','Design tips'],priority:'medium',status:'idea'},
+  // VERY EASY batch 2 (50)
+  {name:'MoodEmoji',cat:'Health',desc:'One-tap mood check-in with emoji, stored as a beautiful calendar heat map.',rev:'$1k–5k',aud:'Emotion-aware adults',feats:['Emoji mood log','Calendar heatmap','Weekly summary','Export'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'PostureTimer',cat:'Health',desc:'Simple 30-minute reminder to sit up straight with a one-tap posture check.',rev:'$500–3k',aud:'Desk workers',feats:['Interval reminder','Posture tip','Streak counter','Custom interval'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'DailyStretch',cat:'Health',desc:'5-minute full-body morning stretch routine video, one per day.',rev:'$1k–4k',aud:'Non-exercisers wanting to start small',feats:['Daily new routine','5-min format','Video guide','Streak'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'BloodPressureLog',cat:'Health',desc:'Simple blood pressure and heart rate logbook with trend chart.',rev:'$1k–5k',aud:'Adults monitoring blood pressure',feats:['BP log','Trend chart','Export PDF','Medication note'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'PillReminder',cat:'Health',desc:'Simple one-pill, one-time daily medication reminder with confirm tap.',rev:'$500–3k',aud:'People on daily medication',feats:['Daily reminder','Confirm tap','Missed dose alert','Notes'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'FridgeMagnet',cat:'Food',desc:'Digital fridge magnet notes — leave messages for family on a shared virtual fridge door.',rev:'$500–2k',aud:'Families at home',feats:['Shared fridge board','Sticky note colors','Photo attach','Push when added'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'CookieTimer',cat:'Food',desc:'Dead-simple baking timer with preset times for cookies, cakes and bread.',rev:'$500–2k',aud:'Home bakers',feats:['Preset timers','Custom timer','Multiple timers','Oven temp guide'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'GroceryList',cat:'Food',desc:'Minimal shared grocery list app — just add items and check them off.',rev:'$1k–5k',aud:'Anyone who grocery shops',feats:['Shared lists','Store aisle sort','Recurring items','Widget'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'FoodExpiry',cat:'Food',desc:'Track food expiry dates with alerts 2 days before something expires.',rev:'$1k–4k',aud:'Households reducing food waste',feats:['Expiry tracker','2-day alert','Barcode scan','Use-it recipe link'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'HealthySwap',cat:'Food',desc:'Find healthier alternatives to your favorite junk foods.',rev:'$500–3k',aud:'People making gradual dietary changes',feats:['Junk food search','Healthy swap suggestion','Calorie compare','Favorites'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'CatSounds',cat:'Pets',desc:'Play cat sounds and watch your cat react — entertainment for cat owners.',rev:'$500–2k',aud:'Cat owners',feats:['30 cat sounds','Bird chirps','Squeak toys','Record cat reaction'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'PawPrint',cat:'Pets',desc:'Create a digital paw print keepsake from a photo of your pet\'s paw.',rev:'$500–2k',aud:'Devoted pet owners',feats:['Paw outline from photo','Print options','Digital save','Share card'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'PetVaccine',cat:'Pets',desc:'Track your pet\'s vaccination history and get reminders for annual boosters.',rev:'$1k–4k',aud:'Responsible pet owners',feats:['Vaccine log','Booster reminders','Vet export','Multi-pet'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'FishFood',cat:'Pets',desc:'Simple fish feeding timer and reminder for aquarium owners.',rev:'$500–2k',aud:'Aquarium owners',feats:['Feeding schedule','Multi-tank','Food type log','Vacation mode'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'BirdFeeder',cat:'Pets',desc:'Bird feeder refill reminder and bird sighting diary for backyard birders.',rev:'$500–2k',aud:'Backyard bird enthusiasts',feats:['Refill reminder','Sighting log','Bird photo','Species list'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'WeatherDress',cat:'Weather',desc:'Simple "what should I wear today?" weather-to-outfit recommender.',rev:'$1k–4k',aud:'People who overthink morning clothing choices',feats:['Weather-to-outfit','Temp threshold settings','Umbrella alert','Location widget'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'SunriseAlarm',cat:'Weather',desc:'Wake up at sunrise — your alarm auto-adjusts to today\'s sunrise time.',rev:'$500–3k',aud:'Early risers and nature enthusiasts',feats:['Auto sunrise alarm','Location-based','Gradual volume','Sunrise photo of day'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'FrostAlert',cat:'Weather',desc:'Alert when overnight temperatures will drop below freezing so you can protect plants.',rev:'$500–2k',aud:'Home gardeners in frost-prone areas',feats:['Freeze threshold alert','7-day forecast','Plant protection tips','Location-based'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'WindSpeed',cat:'Weather',desc:'Simple live wind speed and direction display for sailors, cyclists and kite flyers.',rev:'$500–2k',aud:'Outdoor activity enthusiasts',feats:['Live wind speed','Direction compass','Beaufort scale','Widget'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'UVIndex',cat:'Weather',desc:'Show current UV index with burn time estimate and hourly forecast.',rev:'$500–3k',aud:'Sun-sensitive people and outdoor workers',feats:['Live UV index','Burn time estimate','Hourly forecast','SPF reminder'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'PregnancyCalc',cat:'Parenting',desc:'Calculate your due date, gestational age and trimester from last period date.',rev:'$1k–4k',aud:'Pregnant women',feats:['Due date calc','Gestational age','Trimester guide','Week-by-week updates'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'BabyBottle',cat:'Parenting',desc:'Track baby bottle feeds — time, volume and which parent fed.',rev:'$500–2k',aud:'New parents',feats:['Feed log','Volume tracker','Parent switch','Daily total'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'ToddlerTimer',cat:'Parenting',desc:'Visual sand timer for toddlers — helps them understand time-outs and task durations.',rev:'$500–2k',aud:'Parents of toddlers 2–5',feats:['Visual timer','Calm sounds','Custom duration','Celebration at end'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'ChoreChart',cat:'Parenting',desc:'Simple printable and digital chore chart for kids with star stickers.',rev:'$1k–4k',aud:'Parents of young children',feats:['Chore chart builder','Star sticker system','Print option','Weekly reset'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'BabyPhoto',cat:'Parenting',desc:'Monthly milestone photo frame app to document your baby\'s first year.',rev:'$1k–5k',aud:'New parents',feats:['Monthly frames','Milestone stickers','Share to family','Year slideshow'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'ScoreKeeper',cat:'Sports',desc:'Simple score tracker for any sport or board game.',rev:'$500–2k',aud:'Anyone playing games or sports',feats:['Multi-player score','Custom sport names','History log','Large display'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'JumpRopeCounter',cat:'Sports',desc:'Count jump rope jumps using phone motion sensor with session log.',rev:'$500–2k',aud:'Jump rope fitness fans',feats:['Motion sensor counter','Session log','Personal best','Calorie estimate'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'PushUpCounter',cat:'Sports',desc:'Count push-ups using phone proximity sensor with daily goal.',rev:'$500–2k',aud:'Home workout beginners',feats:['Proximity sensor counter','Daily goal','Streak','Rep log'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'PlankTimer',cat:'Sports',desc:'Plank challenge timer with progressive daily increase and form tips.',rev:'$500–2k',aud:'Core fitness beginners',feats:['Progressive timer','30-day challenge','Form tips','Streak'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'SportScore',cat:'Sports',desc:'Live scores for your favorite sports teams with one-tap follow.',rev:'$1k–5k',aud:'Casual sports fans',feats:['Live scores','Team follow','Match alerts','No-login needed'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'GigCalendar',cat:'Music',desc:'Band gig and rehearsal calendar shared with bandmates.',rev:'$500–3k',aud:'Musicians in bands',feats:['Shared band calendar','RSVP to rehearsals','Venue notes','Setlist attach'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'TunerSimple',cat:'Music',desc:'Dead-simple chromatic instrument tuner, free and offline.',rev:'$500–2k',aud:'Musicians of any instrument',feats:['Chromatic tuner','Multiple instruments','Mic sensitivity','Offline'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'DrumPad',cat:'Music',desc:'Simple 8-pad drum machine for tapping beats on the go.',rev:'$500–3k',aud:'Music hobbyists',feats:['8 drum pads','4 drum kits','Record loop','BPM setting'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'RingtoneCreator',cat:'Music',desc:'Trim any song from your library to create a custom ringtone.',rev:'$1k–4k',aud:'Phone personalization fans',feats:['Song trimmer','Fade in/out','Set as ringtone','Save library'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'SoundCheck',cat:'Music',desc:'Decibel meter for checking room noise level and concert volume.',rev:'$500–2k',aud:'Musicians and noise-sensitive people',feats:['Live dB meter','Peak hold','Log history','Ear damage warning'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'IconPack',cat:'Tools',desc:'Browse and apply icon packs for Android home screen customization.',rev:'$1k–5k',aud:'Android customization fans',feats:['1000+ icons','Icon search','Apply to launcher','Favorites'],priority:'low',status:'idea',mon:'Free + IAP'},
+  {name:'FontViewer',cat:'Tools',desc:'Browse and preview fonts on your device with sample text.',rev:'$500–2k',aud:'Designers and typographers',feats:['System font browse','Custom sample text','Favorites','Share preview'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'QRGenerator',cat:'Tools',desc:'Create QR codes for URLs, WiFi, contacts and text instantly.',rev:'$1k–4k',aud:'Anyone needing QR codes',feats:['URL/WiFi/contact QR','Logo embed','Download PNG','Scan history'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'BarcodeScanner',cat:'Tools',desc:'Ultra-fast barcode and QR scanner with history and product lookup.',rev:'$1k–5k',aud:'Shoppers and logistics users',feats:['Fast scan','History log','Product price lookup','Offline QR create'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'NumberPad',cat:'Tools',desc:'Large-button number pad calculator for people who want big, clear numbers.',rev:'$500–2k',aud:'Elderly users and people with vision impairment',feats:['Giant buttons','High contrast','Basic calc','Voice readout'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'LevelTool',cat:'Tools',desc:'Spirit level and angle measurement tool using phone gyroscope.',rev:'$500–2k',aud:'DIY homeowners',feats:['Spirit level','Angle measure','Bubble level visual','Calibration'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'LandmarkQuiz',cat:'Education',desc:'Guess the world landmark from a photo — daily geography quiz.',rev:'$500–3k',aud:'Geography and travel trivia fans',feats:['Daily photo quiz','200+ landmarks','Score streak','Share result'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'FlagQuiz',cat:'Education',desc:'Learn all 195 world flags with progressive quizzes and flashcards.',rev:'$500–3k',aud:'Geography learners and trivia fans',feats:['195 flags','Progressive quizzes','Flashcard mode','Streak'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'TypingTest',cat:'Education',desc:'Quick 1-minute typing speed test with WPM and accuracy score.',rev:'$500–2k',aud:'Anyone curious about their typing speed',feats:['1-min test','WPM + accuracy','Personal best','Share score'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'MultiplicationTable',cat:'Education',desc:'Multiplication table quiz for kids with star rewards and difficulty levels.',rev:'$500–2k',aud:'Elementary school students',feats:['Times table quiz','Star rewards','Difficulty levels','Parent progress view'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'AlphabetKids',cat:'Education',desc:'Interactive alphabet learning for toddlers with letter sounds and animations.',rev:'$500–3k',aud:'Parents of toddlers 2–4',feats:['Letter animations','Sound pronunciation','Tracing practice','Song mode'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'BudgetJar',cat:'Finance',desc:'Track 3 simple budget buckets: needs, wants, savings.',rev:'$500–3k',aud:'Budget beginners',feats:['3-bucket system','Spending entry','Bucket gauge','Weekly summary'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'LoanCalc',cat:'Finance',desc:'Simple loan and mortgage calculator with amortization schedule.',rev:'$500–3k',aud:'People comparing loan options',feats:['Loan calculator','Amortization schedule','Extra payment impact','Compare loans'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'CurrencyConverter',cat:'Finance',desc:'Offline currency converter with live rates when connected.',rev:'$500–3k',aud:'International travelers and shoppers',feats:['160+ currencies','Offline mode','Live rate sync','Conversion history'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'SavingsCalc',cat:'Finance',desc:'Calculate how long to reach a savings goal with compound interest.',rev:'$500–2k',aud:'Goal-oriented savers',feats:['Goal calculator','Compound interest','Monthly breakdown','Visual progress bar'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'RetirementCalc',cat:'Finance',desc:'Simple retirement savings calculator estimating your retirement age.',rev:'$500–3k',aud:'Adults planning for retirement',feats:['Retirement age calc','Savings rate input','Inflation adjust','Gap analysis'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  // EASY batch 2 (50)
+  {name:'MindfulRun',cat:'Sports',desc:'Guided mindful running sessions combining meditation and movement.',rev:'$20k–45k',aud:'Runners who also practice mindfulness',feats:['Audio guidance','Breathing cues','Pace-aware narration','Gratitude prompts'],priority:'medium',status:'idea',mon:'3-Day Trial + Monthly'},
+  {name:'PaddleTracker',cat:'Sports',desc:'Kayaking and paddleboarding GPS route tracker with water conditions.',rev:'$15k–40k',aud:'Paddle sports enthusiasts',feats:['GPS route log','Water conditions','Distance & speed','Trip photos'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'BodyScan',cat:'Health',desc:'Guided body scan meditation for pain relief and stress with MBSR techniques.',rev:'$20k–45k',aud:'Adults with chronic stress or pain',feats:['Guided body scan','MBSR sessions','Pain journal','Session history'],priority:'medium',status:'idea',mon:'3-Day Trial + Monthly'},
+  {name:'PeriodTracker',cat:'Health',desc:'Simple cycle tracker with PMS prediction and flow logging.',rev:'$20k–45k',aud:'Menstruating adults',feats:['Cycle tracker','PMS prediction','Flow log','Symptom tracking'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'MinimalistBudget',cat:'Finance',desc:'No-frills budget tracker with one input field and instant remaining balance.',rev:'$15k–35k',aud:'People who hate complex apps',feats:['Quick expense entry','Running balance','Month reset','CSV export'],priority:'medium',status:'idea',mon:'One-Time Purchase'},
+  {name:'CryptoAlert',cat:'Finance',desc:'Price alerts and portfolio tracker for crypto with no sign-in required.',rev:'$20k–45k',aud:'Casual crypto holders',feats:['Price alerts','Portfolio tracker','No sign-in','Widget'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'DividendCalc',cat:'Finance',desc:'Calculate annual dividend income from stocks with reinvestment projection.',rev:'$15k–35k',aud:'Dividend investors',feats:['Dividend income calc','DRIP projector','Yield comparison','Portfolio upload'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'PrintableCalendar',cat:'Tools',desc:'Generate beautiful printable monthly calendars with custom events and themes.',rev:'$15k–35k',aud:'People who prefer paper calendars',feats:['Monthly template','Custom events','12 themes','PDF export'],priority:'low',status:'idea',mon:'Free + IAP'},
+  {name:'FocusMusic',cat:'Tools',desc:'Focus-enhancing music and binaural beats player for work and study sessions.',rev:'$20k–45k',aud:'Students and remote workers',feats:['Binaural beats','Lo-fi focus music','Study timer sync','Offline library'],priority:'medium',status:'idea',mon:'3-Day Trial + Monthly'},
+  {name:'ResumeBuilder',cat:'Tools',desc:'Simple one-page resume builder with modern templates and PDF export.',rev:'$20k–45k',aud:'Job seekers',feats:['10+ templates','Real-time preview','PDF export','LinkedIn import'],priority:'high',status:'idea',mon:'Free + IAP'},
+  {name:'InvoiceMaker',cat:'Tools',desc:'Quick invoice generator for freelancers with PDF export and payment tracking.',rev:'$20k–45k',aud:'Freelancers and solo service businesses',feats:['Invoice creator','PDF export','Payment tracking','Client contact book'],priority:'high',status:'idea',mon:'Free + IAP'},
+  {name:'JournalAI',cat:'Health',desc:'AI-powered journaling app that asks follow-up questions to deepen reflection.',rev:'$20k–45k',aud:'Journal writers wanting more depth',feats:['AI follow-up Qs','Mood tagging','Theme detection','Private & encrypted'],priority:'high',status:'idea',mon:'3-Day Trial + Monthly'},
+  {name:'NapTimer',cat:'Health',desc:'Smart nap timer calibrated to sleep cycle science — 20-min power nap or 90-min full cycle.',rev:'$15k–35k',aud:'Adults who nap',feats:['20-min power nap','90-min cycle nap','Gradual wake alarm','Nap quality log'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'DentalTimer',cat:'Health',desc:'2-minute electric toothbrush timer with quadrant tracking and brushing streak.',rev:'$15k–35k',aud:'Adults wanting better dental habits',feats:['2-min timer','4-quadrant guide','Streak counter','Brush replacement reminder'],priority:'low',status:'idea',mon:'Free (Ads)'},
+  {name:'FamilyTree',cat:'Parenting',desc:'Build and share a visual family tree with photos and life stories.',rev:'$20k–45k',aud:'Family historians',feats:['Family tree builder','Photo uploads','Life story notes','Share with relatives'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'HomeworkHelp',cat:'Education',desc:'Parent homework helper with grade-appropriate explanations for common subjects.',rev:'$20k–45k',aud:'Parents helping kids with homework',feats:['Grade filter','Subject library','Step explanations','Video examples'],priority:'high',status:'idea',mon:'3-Day Trial + Monthly'},
+  {name:'SATPrep',cat:'Education',desc:'SAT practice questions with detailed answer explanations and score prediction.',rev:'$20k–45k',aud:'High school juniors and seniors',feats:['1000+ practice Qs','Detailed explanations','Score predictor','Weak area drill'],priority:'high',status:'idea',mon:'Monthly Sub'},
+  {name:'HandwritingPractice',cat:'Education',desc:'Improve handwriting with guided tracing exercises for adults and children.',rev:'$15k–35k',aud:'Adults with poor handwriting and children learning to write',feats:['Tracing exercises','Cursive & print','Pressure guide','Progress scan'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'DreamLog',cat:'Health',desc:'Dream journal with AI theme analysis and recurring symbol detection.',rev:'$15k–40k',aud:'People interested in dreams and psychology',feats:['Voice-to-text log','AI theme analysis','Symbol library','Dream calendar'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'FoodDiary',cat:'Food',desc:'Non-judgmental food diary for intuitive eating without calorie counting.',rev:'$15k–40k',aud:'People recovering from diet culture',feats:['Food log','Hunger/fullness scale','Emotion log','No calorie counting'],priority:'medium',status:'idea',mon:'3-Day Trial + Monthly'},
+  {name:'SousVideCalc',cat:'Food',desc:'Sous vide time and temperature guide for every cut of meat and vegetable.',rev:'$15k–35k',aud:'Home sous vide cooks',feats:['Temp & time by protein','Thickness calculator','Timer integration','Custom recipe save'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'TeaTimer',cat:'Food',desc:'Perfect brew time and temperature guide for every type of tea.',rev:'$15k–30k',aud:'Tea enthusiasts',feats:['Tea type guide','Brew timer','Temperature guide','Tea log'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'CocktailBook',cat:'Food',desc:'Personal digital cocktail recipe book with ingredient search and shopping list.',rev:'$15k–35k',aud:'Home bartenders',feats:['Recipe collection','Ingredient search','Shopping list','Flavor pairing tips'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'FermenterLog',cat:'Food',desc:'Track fermentation batches for sourdough, kimchi, kombucha and home brewing.',rev:'$15k–35k',aud:'Home fermentation hobbyists',feats:['Batch log','pH/temp tracking','Day counter','Recipe notes'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'PetWeight',cat:'Pets',desc:'Track your pet\'s weight trend over time with vet visit log correlation.',rev:'$15k–35k',aud:'Health-conscious pet owners',feats:['Weight log','Trend chart','Vet visit notes','Multi-pet'],priority:'low',status:'idea',mon:'Free + IAP'},
+  {name:'TurtleCare',cat:'Pets',desc:'Turtle and tortoise care guide with UV light schedule and feeding tracker.',rev:'$15k–30k',aud:'Turtle owners',feats:['UV schedule','Feeding log','Temperature guide','Species library'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'RabbitCare',cat:'Pets',desc:'Rabbit health and care tracker with diet guide and vet visit log.',rev:'$15k–30k',aud:'Rabbit owners',feats:['Diet guide','Health log','Vet record','Behavior notes'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'SnowboardLog',cat:'Sports',desc:'Snowboard and ski day log with resort, run count and conditions.',rev:'$15k–35k',aud:'Snow sport enthusiasts',feats:['Day log','Run counter','Resort rating','Season stats'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'SurfLog',cat:'Sports',desc:'Surf session log with swell conditions, spot rating and board used.',rev:'$15k–35k',aud:'Surfers',feats:['Session log','Swell conditions','Spot map','Board tracker'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'ArcheryLog',cat:'Sports',desc:'Arrow score tracker and form note app for target and field archery.',rev:'$15k–30k',aud:'Archers',feats:['Score tracker','End log','Group size measure','Form notes'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'ChessOpenings',cat:'Games',desc:'Learn and practice 100 essential chess openings with line drills.',rev:'$15k–40k',aud:'Improving chess players',feats:['100+ openings','Line drill','Opening stats','Mistake alerts'],priority:'medium',status:'idea',mon:'One-Time Purchase'},
+  {name:'CrosswordMaker',cat:'Games',desc:'Create and share custom crossword puzzles for friends, family or classrooms.',rev:'$15k–35k',aud:'Puzzle creators and teachers',feats:['Grid builder','Clue editor','Share link','Print option'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'DigitalArt',cat:'Photo & Video',desc:'Simple pixel art and digital illustration app for beginners with sharing.',rev:'$15k–40k',aud:'Casual art hobbyists',feats:['Pixel canvas','Layer support','Color palette','Share to social'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'PhotoBook',cat:'Photo & Video',desc:'Create a print-on-demand photo book from your camera roll in minutes.',rev:'$20k–45k',aud:'Family memory keepers',feats:['Auto-layout','Theme templates','Photo editing','Print & ship'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'AnimatedText',cat:'Photo & Video',desc:'Add animated text overlays to photos for Instagram stories and social media.',rev:'$15k–40k',aud:'Social media creators',feats:['50+ text animations','Font library','Color & size','Export 9:16/1:1'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'LandscapeAstro',cat:'Photo & Video',desc:'Plan landscape and astrophotography shots with golden hour and Milky Way positioning.',rev:'$15k–40k',aud:'Landscape and astro photographers',feats:['Golden hour planner','Milky Way arc position','Moon phase','Location scouting'],priority:'medium',status:'idea',mon:'One-Time Purchase'},
+  {name:'SlowMoEditor',cat:'Photo & Video',desc:'Convert any video to slow motion with frame interpolation AI.',rev:'$20k–45k',aud:'Content creators and sports fans',feats:['AI frame interpolation','Speed control','Clip trim','Export HD'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'TravelStory',cat:'Travel',desc:'Create auto-generated travel recap videos from your trip photos.',rev:'$15k–40k',aud:'Travelers who want to share memories',feats:['Auto slideshow','Music sync','Location map overlay','Export MP4'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'CityGuide',cat:'Travel',desc:'Offline city guide app with curated neighborhood walks and local tips.',rev:'$15k–40k',aud:'Urban tourists and city explorers',feats:['Offline maps','Neighborhood walks','Local food picks','Hidden gems'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'NomadTax',cat:'Travel',desc:'Tax residency calculator and guide for digital nomads living in multiple countries.',rev:'$20k–45k',aud:'Digital nomads and long-term travelers',feats:['Days-in-country tracker','Tax residency calc','Treaty guide','Accountant export'],priority:'high',status:'idea',mon:'Monthly Sub'},
+  {name:'HostelFinder',cat:'Travel',desc:'Find and book budget hostels with vibe ratings, dorm vs private and social events.',rev:'$15k–40k',aud:'Budget backpackers',feats:['Hostel search','Vibe rating','Dorm vs private','Social events'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'WeatherWidget Pro',cat:'Weather',desc:'Premium weather widgets with beautiful designs, rain radar and hourly forecast.',rev:'$20k–40k',aud:'Weather widget enthusiasts',feats:['20+ widget designs','Rain radar','Hourly forecast','Complications for Apple Watch'],priority:'medium',status:'idea',mon:'One-Time Purchase'},
+  {name:'CloudID',cat:'Weather',desc:'Identify cloud types from photos with meteorological context and formation guide.',rev:'$15k–30k',aud:'Weather enthusiasts and students',feats:['Photo cloud ID','Cloud type library','Weather implications','Sighting log'],priority:'low',status:'idea',mon:'One-Time Purchase'},
+  {name:'EventWeather',cat:'Weather',desc:'Long-range weather forecast for a specific date and location up to 60 days out.',rev:'$15k–35k',aud:'Event organizers and outdoor planners',feats:['60-day forecast','Location-specific','Historical average','Confidence rating'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'LullabyApp',cat:'Parenting',desc:'50+ lullabies from around the world with sleep timer and bedtime routine tracker.',rev:'$15k–40k',aud:'Parents of babies and toddlers',feats:['50+ lullabies','Sleep timer','Bedtime routine log','Cultural origins'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'PediatricDoses',cat:'Parenting',desc:'Safe medication dosing calculator for children by weight for common OTC medicines.',rev:'$15k–35k',aud:'Parents of young children',feats:['Weight-based dosing','Common OTC medicines','Age range check','Pharmacy locator'],priority:'high',status:'idea',mon:'Free (Ads)'},
+  {name:'BabySignLanguage',cat:'Parenting',desc:'Teach your baby sign language with video demos and practice tracking.',rev:'$15k–35k',aud:'Parents of babies 6–24 months',feats:['100+ signs','Video demos','Practice tracker','Toddler-friendly quiz'],priority:'medium',status:'idea',mon:'One-Time Purchase'},
+  {name:'EntertainmentCalendar',cat:'Entertainment',desc:'Never miss a movie, game or album release — track upcoming releases in one calendar.',rev:'$15k–40k',aud:'Pop culture enthusiasts',feats:['Movie/game/music releases','Follow watchlist','Release alerts','Trailer links'],priority:'medium',status:'idea',mon:'Free + IAP'},
+  {name:'StreamingDeals',cat:'Entertainment',desc:'Track streaming service deals, free trials and when prices are going up.',rev:'$15k–35k',aud:'Streaming service subscribers',feats:['Price tracker','Free trial tracker','Renewal alerts','Cancel reminder'],priority:'medium',status:'idea',mon:'Free (Ads)'},
+  {name:'AwardsSeason',cat:'Entertainment',desc:'Track awards season races (Oscars, Grammys, Emmys) with predictions and results.',rev:'$15k–35k',aud:'Entertainment fans and awards watchers',feats:['Awards tracker','Prediction league','Nominee profiles','Live results'],priority:'low',status:'idea',mon:'Free (Ads)'},
 ];
 
 let projects=[],notes={},prefs={theme:'dark',sort:'revenue'},favs=new Set(),activeId=null;
-let filters={cats:[],status:[],diff:[],favOnly:false,query:'',minDaily:0,sort:'revenue'};
+let filters={cats:[],status:[],diff:[],earn:[],favOnly:false,query:'',minDaily:0,sort:'revenue'};
 
 function loadData(){
   const seeded=localStorage.getItem(SEED_KEY);
@@ -862,6 +988,21 @@ function buildSidebar(){
     };
     df.appendChild(btn);
   });
+  // Earn methods
+  const ef=document.getElementById('earnFilters');
+  ef.innerHTML='';
+  EARN_METHODS.forEach(em=>{
+    const btn=document.createElement('button');
+    btn.className='filter-btn';
+    btn.innerHTML=`<span style="width:8px;height:8px;border-radius:50%;background:${EARN_COLORS[em]};flex-shrink:0;display:inline-block"></span>${em}`;
+    btn.onclick=()=>{
+      btn.classList.toggle('active');
+      const i=filters.earn.indexOf(em);
+      if(i>-1)filters.earn.splice(i,1);else filters.earn.push(em);
+      render();
+    };
+    ef.appendChild(btn);
+  });
   // Status
   const sf=document.getElementById('statusFilters');
   sf.innerHTML='';
@@ -884,6 +1025,12 @@ function buildSidebar(){
     o.value=c;o.textContent=c;
     fCat.appendChild(o);
   });
+  const fMon=document.getElementById('fMon');
+  EARN_METHODS.forEach(em=>{
+    const o=document.createElement('option');
+    o.value=em;o.textContent=em;
+    fMon.appendChild(o);
+  });
 }
 function toggleCat(name,btn){
   document.querySelectorAll('#catFilters .filter-btn').forEach(b=>b.classList.remove('active'));
@@ -904,6 +1051,7 @@ function getFiltered(){
   if(filters.cats.length)r=r.filter(p=>filters.cats.includes(p.cat));
   if(filters.status.length)r=r.filter(p=>filters.status.includes(p.status));
   if(filters.diff.length)r=r.filter(p=>filters.diff.includes(getDiff(p.rev).label));
+  if(filters.earn.length)r=r.filter(p=>filters.earn.includes(getEarn(p)));
   if(filters.favOnly)r=r.filter(p=>favs.has(p.id));
   if(filters.minDaily>0)r=r.filter(p=>getEarnings(p.rev).daily>=filters.minDaily);
   if(filters.query){
@@ -963,7 +1111,8 @@ function renderCard(p){
         <div class="diff-bar"><div class="diff-fill" style="width:${d.pct}%;background:${d.color}"></div></div>
         <span class="diff-pct">${d.pct}%</span>
       </div>
-      <div class="tags">${tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <div class="tags" style="margin-bottom:6px">${tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <div><span style="font-size:10px;padding:2px 8px;border-radius:12px;background:${EARN_COLORS[getEarn(p)]}22;color:${EARN_COLORS[getEarn(p)]};border:1px solid ${EARN_COLORS[getEarn(p)]}55;font-weight:600">💲 ${getEarn(p)}</span></div>
     </div>
     <span class="status-badge" style="background:${sc}" onclick="event.stopPropagation();cycleStatus('${p.id}')">${st}</span>
   </div>`;
@@ -1041,6 +1190,7 @@ function renderTabContent(idx,p,e,d,c){
         <div class="info-card"><label>Competition</label><div class="val" style="color:${d.color}">${d.label} (${d.pct}% chance)</div></div>
         <div class="info-card"><label>Target Audience</label><div class="val">${esc(p.aud||'—')}</div></div>
         <div class="info-card"><label>Priority</label><div class="val">${p.priority||'medium'}</div></div>
+        <div class="info-card" style="grid-column:1/-1"><label>Earning Method</label><div class="val" style="color:${EARN_COLORS[getEarn(p)]}">💲 ${getEarn(p)}</div></div>
       </div>
       <div class="section-title">📋 Description</div>
       <p style="font-size:14px;line-height:1.7;color:var(--text2);margin-bottom:16px">${esc(p.desc||'')}</p>
@@ -1131,11 +1281,12 @@ function saveAdd(){
   const featsRaw=document.getElementById('fFeats').value;
   const feats=featsRaw?featsRaw.split(',').map(f=>f.trim()).filter(Boolean):[];
   const id='u'+Date.now();
+  const monVal=document.getElementById('fMon').value;
   const p={id,name,cat,
     desc:document.getElementById('fDesc').value.trim(),
     rev:document.getElementById('fRev').value.trim(),
     aud:document.getElementById('fAud').value.trim(),
-    feats,priority:'medium',status:'idea',createdAt:Date.now()};
+    feats,mon:monVal||undefined,priority:'medium',status:'idea',createdAt:Date.now()};
   const noteText=document.getElementById('fNotes').value.trim();
   if(noteText)notes[id]=noteText;
   projects.unshift(p);
